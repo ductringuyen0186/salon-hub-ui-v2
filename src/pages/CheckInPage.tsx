@@ -15,7 +15,7 @@ const CheckInPage = () => {
           <div>
             <Link to="/">
               <h1 className="text-3xl font-bold text-primary">
-                Elegant Nails & Spa
+                Five Nails & Spa
               </h1>
             </Link>
             <p className="text-gray-500">
@@ -75,7 +75,7 @@ const CheckInPage = () => {
       <footer className="bg-white border-t mt-auto">
         <div className="container mx-auto px-4 py-6 text-center text-gray-500">
           <p>
-            © {new Date().getFullYear()} Elegant Nails & Spa. All rights
+            © {new Date().getFullYear()} Five Nails & Spa. All rights
             reserved.
           </p>
           <p className="text-sm mt-1">

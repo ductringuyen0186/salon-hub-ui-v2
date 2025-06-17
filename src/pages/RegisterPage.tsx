@@ -21,6 +21,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import api from "@/services/api";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z
   .object({
@@ -57,12 +60,31 @@ const RegisterPage = () => {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
-    // Here you would typically send the data to your backend
-    alert(
-      "Registration successful! Please check your email to verify your account.",
-    );
+  // Add state for registration status
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const onSubmit = async (data: FormValues) => {
+    setIsSubmitting(true);
+    setRegistrationError(null);
+    
+    try {
+      const response = await api.post('/customers', {
+        email: data.email,
+        name: `${data.firstName} ${data.lastName}`,
+        phoneNumber: data.phone,
+        password: data.password
+      });
+      
+      // Registration successful
+      alert("Registration successful! Please check your email to verify your account.");
+      navigate('/login');
+    } catch (error: any) {
+      setRegistrationError(error.response?.data?.message || "Registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -165,9 +187,10 @@ const RegisterPage = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full">
-                Register
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Registering..." : "Register"}
               </Button>
+              {registrationError && <p className="text-red-500 text-sm mt-2">{registrationError}</p>}
             </form>
           </Form>
         </CardContent>

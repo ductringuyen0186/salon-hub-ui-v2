@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Card,
@@ -45,6 +45,7 @@ import {
   UserCheck,
   RefreshCw,
 } from "lucide-react";
+import api from "@/services/api";
 
 interface Customer {
   id: string;
@@ -57,48 +58,39 @@ interface Customer {
 }
 
 const AdminDashboard = () => {
-  const [customers, setCustomers] = useState<Customer[]>([
-    {
-      id: "1",
-      name: "Jane Smith",
-      contact: "555-123-4567",
-      status: "online",
-      waitTime: 15,
-      checkInTime: "10:30 AM",
-      service: "Manicure",
-    },
-    {
-      id: "2",
-      name: "John Doe",
-      contact: "555-987-6543",
-      status: "in-store",
-      waitTime: 25,
-      checkInTime: "10:45 AM",
-      service: "Pedicure",
-    },
-    {
-      id: "3",
-      name: "Alice Johnson",
-      contact: "alice@example.com",
-      status: "online",
-      waitTime: 35,
-      checkInTime: "11:00 AM",
-      service: "Full Set",
-    },
-    {
-      id: "4",
-      name: "Robert Brown",
-      contact: "555-555-5555",
-      status: "in-store",
-      waitTime: 40,
-      checkInTime: "11:15 AM",
-      service: "Manicure & Pedicure",
-    },
-  ]);
-
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await api.get('/checkin/queue');
+        if (response.data) {
+          // Transform the data to match your Customer interface
+          const formattedCustomers = response.data.map((customer: any) => ({
+            id: customer.id.toString(),
+            name: customer.name,
+            contact: customer.contact,
+            status: customer.inStore ? "in-store" : "online",
+            waitTime: customer.estimatedWaitTime,
+            checkInTime: customer.checkInTime,
+            service: customer.requestedService || "Not specified"
+          }));
+          setCustomers(formattedCustomers);
+        }
+      } catch (error) {
+        console.error("Failed to fetch customers:", error);
+      }
+    };
+
+    fetchCustomers();
+    
+    // Set up polling to refresh data every 30 seconds
+    const interval = setInterval(fetchCustomers, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleStatusChange = (
     customerId: string,
@@ -141,6 +133,26 @@ const AdminDashboard = () => {
       );
       setIsDialogOpen(false);
       setEditingCustomer(null);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      const response = await api.get('/checkin/queue');
+      if (response.data) {
+        const formattedCustomers = response.data.map((customer: any) => ({
+          id: customer.id.toString(),
+          name: customer.name,
+          contact: customer.contact,
+          status: customer.inStore ? "in-store" : "online",
+          waitTime: customer.estimatedWaitTime,
+          checkInTime: customer.checkInTime,
+          service: customer.requestedService || "Not specified"
+        }));
+        setCustomers(formattedCustomers);
+      }
+    } catch (error) {
+      console.error("Failed to refresh customers:", error);
     }
   };
 
@@ -187,7 +199,7 @@ const AdminDashboard = () => {
               />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={handleRefresh}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
               </Button>

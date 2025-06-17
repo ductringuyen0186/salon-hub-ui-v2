@@ -11,7 +11,7 @@ const Home = () => {
 
   // Mock data for the salon information
   const salonInfo = {
-    name: "Elegant Nails & Spa",
+    name: "Five Nails & Spa",
     address: "123 Beauty Lane, Styleville",
     phone: "(555) 123-4567",
     currentWaitTime: "~25 minutes",

@@ -12,7 +12,7 @@ const SalonShowcase = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <div className="space-y-6">
           <h1 className="text-4xl md:text-5xl font-bold text-primary">
-            Elegant Nails & Spa
+            Five Nails & Spa
           </h1>
           <p className="text-xl text-muted-foreground">
             Experience luxury nail care in a relaxing environment. Our skilled
@@ -41,7 +41,7 @@ const SalonShowcase = () => {
           <CardContent className="p-0">
             <img
               src="https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=800&q=80"
-              alt="Elegant Nails & Spa"
+              alt="Five Nails & Spa"
               className="w-full h-[300px] object-cover"
             />
           </CardContent>

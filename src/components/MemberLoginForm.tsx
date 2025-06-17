@@ -24,6 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { UserIcon, KeyIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
+import api from "@/services/api";
 
 const loginFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -63,35 +64,41 @@ const MemberLoginForm = () => {
     setLoginError(null);
 
     try {
-      // Simulate API call with timeout
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock successful login - in a real app, this would be an API call
-      if (data.email === "test@example.com" && data.password === "password") {
-        setIsLoggedIn(true);
-        setMemberPreferences({
-          name: "Jane Smith",
-          preferredServices: ["Manicure", "Pedicure", "Gel Polish"],
-          lastVisit: "2023-05-15",
-        });
-      } else {
-        setLoginError("Invalid email or password");
-      }
-    } catch (error) {
-      setLoginError("An error occurred. Please try again.");
+      const response = await api.post('/auth/login', {
+        email: data.email,
+        password: data.password
+      });
+      
+      setIsLoggedIn(true);
+      setMemberPreferences({
+        name: response.data.name,
+        preferredServices: response.data.preferredServices || [],
+        lastVisit: response.data.lastVisit
+      });
+    } catch (error: any) {
+      setLoginError(error.response?.data?.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCheckIn = () => {
+  const handleCheckIn = async () => {
     setIsLoading(true);
 
-    // Simulate API call with timeout
-    setTimeout(() => {
-      setIsCheckedIn(true);
+    try {
+      const response = await api.post('/checkin', {
+        email: memberPreferences?.email,
+        isGuest: false
+      });
+      
+      if (response.data.success) {
+        setIsCheckedIn(true);
+      }
+    } catch (error) {
+      console.error("Check-in failed:", error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

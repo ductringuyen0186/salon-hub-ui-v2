@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Check, Loader2 } from "lucide-react";
+import api from "@/services/api";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -55,15 +56,20 @@ const CheckInForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock response with estimated wait time
-      setEstimatedWaitTime(25); // 25 minutes wait time
-      setIsSuccess(true);
-
-      // Reset form after successful submission
-      form.reset();
+      const response = await api.post('/checkin', {
+        name: values.name,
+        contact: values.contact,
+        isGuest: true
+      });
+      
+      if (response.data.success) {
+        setEstimatedWaitTime(response.data.estimatedWaitTime || 25);
+        setIsSuccess(true);
+        form.reset();
+      } else {
+        // Handle error from API
+        console.error("Check-in failed:", response.data.message);
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
