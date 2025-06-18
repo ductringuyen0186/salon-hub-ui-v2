@@ -88,10 +88,10 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-dynamic-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-dynamic-surface border-dynamic-border">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-primary">
+          <CardTitle className="text-2xl font-bold text-dynamic-primary">
             Create an Account
           </CardTitle>
         </CardHeader>
@@ -195,9 +195,9 @@ const RegisterPage = () => {
           </Form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-dynamic-text-secondary">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary hover:underline">
+            <Link to="/login" className="text-dynamic-primary hover:text-dynamic-primary hover:underline transition-colors">
               Login here
             </Link>
           </p>

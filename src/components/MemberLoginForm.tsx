@@ -23,8 +23,10 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { UserIcon, KeyIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
+import { UserIcon, KeyIcon, CheckCircleIcon, XCircleIcon, Settings } from "lucide-react";
 import api from "@/services/api";
+import { useNavigate } from "react-router-dom";
+import { setUserData, clearAuthData, type User } from "@/lib/auth";
 
 const loginFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -38,14 +40,18 @@ type LoginFormValues = z.infer<typeof loginFormSchema>;
 
 interface MemberPreferences {
   name: string;
-  preferredServices: string[];
-  lastVisit: string;
+  email: string;
+  role: string;
+  preferredServices?: string[];
+  lastVisit?: string;
 }
 
 const MemberLoginForm = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [checkInError, setCheckInError] = useState<string | null>(null);
   const [memberPreferences, setMemberPreferences] =
     useState<MemberPreferences | null>(null);
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -68,13 +74,21 @@ const MemberLoginForm = () => {
         email: data.email,
         password: data.password
       });
-      
+
+      const userData: User = {
+        name: response.data.user.name,
+        email: response.data.user.email,
+        role: response.data.user.role,
+        preferredServices: response.data.user.preferredServices ?
+          response.data.user.preferredServices.split(',').map((s: string) => s.trim()) : [],
+        lastVisit: response.data.user.lastVisit
+      };
+
       setIsLoggedIn(true);
-      setMemberPreferences({
-        name: response.data.name,
-        preferredServices: response.data.preferredServices || [],
-        lastVisit: response.data.lastVisit
-      });
+      setMemberPreferences(userData);
+
+      // Store user data in localStorage for session management
+      setUserData(userData, response.data.accessToken);
     } catch (error: any) {
       setLoginError(error.response?.data?.message || "Invalid email or password");
     } finally {
@@ -84,21 +98,39 @@ const MemberLoginForm = () => {
 
   const handleCheckIn = async () => {
     setIsLoading(true);
+    setCheckInError(null);
 
     try {
       const response = await api.post('/checkin', {
         email: memberPreferences?.email,
         isGuest: false
       });
-      
+
       if (response.data.success) {
         setIsCheckedIn(true);
+      } else {
+        setCheckInError(response.data.message || "Check-in failed");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Check-in failed:", error);
+      setCheckInError(error.response?.data?.message || "Check-in failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setIsCheckedIn(false);
+    setMemberPreferences(null);
+    setLoginError(null);
+    setCheckInError(null);
+    clearAuthData();
+    form.reset();
+  };
+
+  const handleAdminToggle = () => {
+    navigate('/admin');
   };
 
   return (
@@ -213,6 +245,27 @@ const MemberLoginForm = () => {
                   <p className="font-medium">Estimated wait time:</p>
                   <p className="text-2xl font-bold">25 minutes</p>
                 </div>
+                <div className="space-y-2 mt-4">
+                  {memberPreferences?.role === 'ADMIN' && (
+                    <Button
+                      onClick={handleAdminToggle}
+                      variant="secondary"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Admin Dashboard
+                    </Button>
+                  )}
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    Logout
+                  </Button>
+                </div>
               </div>
             ) : (
               <>
@@ -221,26 +274,55 @@ const MemberLoginForm = () => {
                     Welcome back, {memberPreferences?.name}!
                   </h3>
                 </div>
+                {checkInError && (
+                  <Alert variant="destructive" className="mb-4">
+                    <XCircleIcon className="h-4 w-4" />
+                    <AlertDescription>{checkInError}</AlertDescription>
+                  </Alert>
+                )}
                 <div className="bg-muted p-4 rounded-md space-y-3">
                   <h4 className="font-medium">Your Preferences</h4>
                   <div>
                     <p className="text-sm text-muted-foreground">
                       Preferred Services:
                     </p>
-                    <p>{memberPreferences?.preferredServices.join(", ")}</p>
+                    <p>{memberPreferences?.preferredServices && memberPreferences.preferredServices.length > 0
+                        ? memberPreferences.preferredServices.join(", ")
+                        : "No preferences set"}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Last Visit:</p>
-                    <p>{memberPreferences?.lastVisit}</p>
+                    <p>{memberPreferences?.lastVisit || "No previous visits"}</p>
                   </div>
                 </div>
-                <Button
-                  onClick={handleCheckIn}
-                  className="w-full mt-4"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Processing..." : "Check In Now"}
-                </Button>
+                <div className="space-y-2 mt-4">
+                  <Button
+                    onClick={handleCheckIn}
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Processing..." : "Check In Now"}
+                  </Button>
+                  {memberPreferences?.role === 'ADMIN' && (
+                    <Button
+                      onClick={handleAdminToggle}
+                      variant="secondary"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Admin Dashboard
+                    </Button>
+                  )}
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    Logout
+                  </Button>
+                </div>
               </>
             )}
           </div>

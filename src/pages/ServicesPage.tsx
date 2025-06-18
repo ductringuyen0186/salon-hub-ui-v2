@@ -76,34 +76,34 @@ const ServicesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dynamic-background">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-dynamic-surface shadow-sm border-b border-dynamic-border">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-primary">
+            <h1 className="text-3xl font-bold text-dynamic-primary">
               {salonInfo.name}
             </h1>
-            <p className="text-gray-500">
+            <p className="text-dynamic-text-secondary">
               {salonInfo.address} | {salonInfo.phone}
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="bg-primary/10 px-4 py-2 rounded-md flex items-center">
-              <Clock className="h-5 w-5 text-primary mr-2" />
-              <span className="font-medium">
+            <div className="bg-dynamic-primary/10 px-4 py-2 rounded-md flex items-center border border-dynamic-border">
+              <Clock className="h-5 w-5 text-dynamic-primary mr-2" />
+              <span className="font-medium text-dynamic-text">
                 Current Wait:{" "}
-                <span className="text-primary">
+                <span className="text-dynamic-primary">
                   {salonInfo.currentWaitTime}
                 </span>
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Link to="/login" className="text-primary hover:text-primary/80">
+              <Link to="/login" className="text-dynamic-primary hover:text-dynamic-primary">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 border-dynamic-border text-dynamic-text hover:bg-dynamic-background"
                 >
                   <LockIcon className="h-4 w-4" />
                   Login
@@ -111,12 +111,12 @@ const ServicesPage = () => {
               </Link>
               <Link
                 to="/register"
-                className="text-primary hover:text-primary/80"
+                className="text-dynamic-primary hover:text-dynamic-primary"
               >
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 border-dynamic-border text-dynamic-text hover:bg-dynamic-background"
                 >
                   <UserPlus className="h-4 w-4" />
                   Register
@@ -130,10 +130,10 @@ const ServicesPage = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8 text-primary">
+          <h2 className="text-3xl font-bold text-center mb-8 text-dynamic-primary">
             Our Services
           </h2>
-          <p className="text-center text-lg text-muted-foreground mb-12">
+          <p className="text-center text-lg text-dynamic-text-secondary mb-12">
             Browse our comprehensive list of nail care services. All services
             include sanitized tools and premium products for your safety and
             satisfaction.
@@ -141,27 +141,27 @@ const ServicesPage = () => {
 
           <div className="space-y-12">
             {services.map((category) => (
-              <Card key={category.id} className="overflow-hidden">
-                <CardHeader className="bg-primary/5">
-                  <CardTitle className="text-2xl text-primary">
+              <Card key={category.id} className="overflow-hidden bg-dynamic-surface border-dynamic-border">
+                <CardHeader className="bg-dynamic-primary/5">
+                  <CardTitle className="text-2xl text-dynamic-primary">
                     {category.category}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="divide-y">
+                  <div className="divide-y divide-dynamic-border">
                     {category.services.map((service, index) => (
                       <div
                         key={index}
-                        className="flex justify-between items-center p-4 hover:bg-gray-50"
+                        className="flex justify-between items-center p-4 hover:bg-dynamic-background transition-colors"
                       >
                         <div>
-                          <h3 className="font-medium">{service.name}</h3>
-                          <p className="text-sm text-muted-foreground">
+                          <h3 className="font-medium text-dynamic-text">{service.name}</h3>
+                          <p className="text-sm text-dynamic-text-secondary">
                             Approx. {service.duration} minutes
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-lg">${service.price}</p>
+                          <p className="font-bold text-lg text-dynamic-text">${service.price}</p>
                         </div>
                       </div>
                     ))}
@@ -175,11 +175,11 @@ const ServicesPage = () => {
             <Button
               size="lg"
               onClick={() => (window.location.href = "/check-in")}
-              className="text-lg px-8"
+              className="text-lg px-8 bg-dynamic-primary hover:bg-dynamic-primary-hover text-white"
             >
               Check In Now
             </Button>
-            <p className="mt-2 text-muted-foreground">
+            <p className="mt-2 text-dynamic-text-secondary">
               Ready for your service? Join our wait list now!
             </p>
           </div>
@@ -187,8 +187,8 @@ const ServicesPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-16">
-        <div className="container mx-auto px-4 py-6 text-center text-gray-500">
+      <footer className="bg-dynamic-surface border-t border-dynamic-border mt-16">
+        <div className="container mx-auto px-4 py-6 text-center text-dynamic-text-secondary">
           <p>
             © {new Date().getFullYear()} {salonInfo.name}. All rights reserved.
           </p>

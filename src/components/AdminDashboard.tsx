@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import ColorPalette from "@/components/ColorPalette";
+import AdminColorThemeManager from "./AdminColorThemeManager";
 import {
   Table,
   TableBody,
@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import BookingManagement from "./BookingManagement";
 import {
   Search,
   Plus,
@@ -46,6 +47,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import api from "@/services/api";
+import { isAdmin, isAuthenticated, clearAuthData } from "@/lib/auth";
 
 interface Customer {
   id: string;
@@ -58,10 +60,19 @@ interface Customer {
 }
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Check authentication and admin role
+  useEffect(() => {
+    if (!isAuthenticated() || !isAdmin()) {
+      // Redirect to login if not authenticated or not admin
+      navigate('/login');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -156,6 +167,11 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    clearAuthData();
+    navigate('/login');
+  };
+
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -163,26 +179,32 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="bg-background p-6 min-h-screen">
-      <Card className="mb-6">
+    <div className="bg-dynamic-background p-6 min-h-screen">
+      <Card className="bg-dynamic-surface border-dynamic-border mb-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-2xl">Salon Admin Dashboard</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl text-dynamic-text">Salon Admin Dashboard</CardTitle>
+            <CardDescription className="text-dynamic-text-secondary">
               Manage customer queue, update statuses, and adjust wait times
             </CardDescription>
           </div>
-          <Link to="/">
-            <Button variant="outline" size="sm">
-              Return to Home
+          <div className="flex gap-2">
+            <Link to="/">
+              <Button variant="outline" size="sm">
+                Return to Home
+              </Button>
+            </Link>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              Logout
             </Button>
-          </Link>
+          </div>
         </CardHeader>
       </Card>
 
       <Tabs defaultValue="queue" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="queue">Current Queue</TabsTrigger>
+          <TabsTrigger value="bookings">Bookings</TabsTrigger>
           <TabsTrigger value="stats">Statistics</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
@@ -321,6 +343,10 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="bookings">
+          <BookingManagement />
+        </TabsContent>
+
         <TabsContent value="stats">
           <Card>
             <CardHeader>
@@ -366,7 +392,10 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="settings">
+        <TabsContent value="settings" className="space-y-6">
+          {/* Color Theme Management */}
+          <AdminColorThemeManager />
+
           <Card>
             <CardHeader>
               <CardTitle>Dashboard Settings</CardTitle>

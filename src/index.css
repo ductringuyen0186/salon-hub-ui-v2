@@ -74,3 +74,111 @@
       @apply bg-background text-foreground;
     }
   }
+
+/* Dynamic Color System */
+:root {
+  /* Default theme colors (Pastel Rose) */
+  --color-primary: #f8a5c2;
+  --color-primary-hover: #f48fb1;
+  --color-secondary: #d4b5a0;
+  --color-background: #fef7f7;
+  --color-surface: #ffffff;
+  --color-text: #2d3748;
+  --color-text-secondary: #718096;
+  --color-border: #f1e8e8;
+  --color-accent: #fbb6ce;
+}
+
+/* Dynamic color utility classes */
+@layer utilities {
+  /* Background colors */
+  .bg-dynamic-primary {
+    background-color: var(--color-primary);
+  }
+
+  .bg-dynamic-surface {
+    background-color: var(--color-surface);
+  }
+
+  .bg-dynamic-background {
+    background-color: var(--color-background);
+  }
+
+  .bg-dynamic-secondary {
+    background-color: var(--color-secondary);
+  }
+
+  .bg-dynamic-accent {
+    background-color: var(--color-accent);
+  }
+
+  /* Text colors */
+  .text-dynamic-primary {
+    color: var(--color-primary);
+  }
+
+  .text-dynamic-text {
+    color: var(--color-text);
+  }
+
+  .text-dynamic-text-secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .text-dynamic-secondary {
+    color: var(--color-secondary);
+  }
+
+  .text-dynamic-accent {
+    color: var(--color-accent);
+  }
+
+  /* Border colors */
+  .border-dynamic-border {
+    border-color: var(--color-border);
+  }
+
+  .border-dynamic-primary {
+    border-color: var(--color-primary);
+  }
+
+  .border-dynamic-accent {
+    border-color: var(--color-accent);
+  }
+
+  /* Hover states */
+  .hover\:bg-dynamic-primary-hover:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  .hover\:bg-dynamic-primary:hover {
+    background-color: var(--color-primary);
+  }
+
+  .hover\:text-dynamic-primary:hover {
+    color: var(--color-primary);
+  }
+
+  .hover\:border-dynamic-primary:hover {
+    border-color: var(--color-primary);
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-dynamic {
+    background: linear-gradient(135deg, var(--color-background) 0%, var(--color-surface) 50%, var(--color-accent) 100%);
+  }
+
+  .bg-gradient-dynamic-soft {
+    background: linear-gradient(135deg, var(--color-background) 0%, var(--color-surface) 100%);
+  }
+
+  /* Luxury effects */
+  .shadow-dynamic {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .shadow-dynamic-lg {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+}
+

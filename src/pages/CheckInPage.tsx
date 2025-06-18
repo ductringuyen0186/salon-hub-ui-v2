@@ -3,32 +3,23 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import CheckInForm from "@/components/CheckInForm";
 import MemberLoginForm from "@/components/MemberLoginForm";
+import Navigation from "@/components/Navigation";
 import { UserPlus, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const CheckInPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dynamic-background">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-6 flex justify-between items-center">
-          <div>
-            <Link to="/">
-              <h1 className="text-3xl font-bold text-primary">
-                Five Nails & Spa
-              </h1>
-            </Link>
-            <p className="text-gray-500">
-              123 Beauty Lane, Styleville | (555) 123-4567
-            </p>
-          </div>
-        </div>
-      </header>
+      <Navigation
+        showBackButton={true}
+        title="Check In"
+        subtitle="Join our wait list or login as a member"
+      />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-6">Check In</h2>
 
           <Tabs defaultValue="guest" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-8">
@@ -64,7 +55,7 @@ const CheckInPage = () => {
           </Tabs>
 
           <div className="text-center mt-8">
-            <Link to="/" className="text-primary hover:underline">
+            <Link to="/" className="text-dynamic-primary hover:text-dynamic-primary hover:underline transition-colors">
               Return to Home
             </Link>
           </div>
@@ -72,8 +63,8 @@ const CheckInPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-auto">
-        <div className="container mx-auto px-4 py-6 text-center text-gray-500">
+      <footer className="bg-dynamic-surface border-t border-dynamic-border mt-auto">
+        <div className="container mx-auto px-4 py-6 text-center text-dynamic-text-secondary">
           <p>
             © {new Date().getFullYear()} Five Nails & Spa. All rights
             reserved.

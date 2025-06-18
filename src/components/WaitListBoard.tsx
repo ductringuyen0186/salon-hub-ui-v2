@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -11,7 +11,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowUpDown } from "lucide-react";
+import { Search, ArrowUpDown, Clock, User } from "lucide-react";
+import { mockBookings } from "@/lib/bookingData";
+import { mockCustomersQueue } from "@/lib/mockData";
 
 interface Customer {
   id: string;
@@ -19,6 +21,8 @@ interface Customer {
   status: "online" | "in-store";
   estimatedWaitTime: number; // in minutes
   checkInTime: Date;
+  service?: string;
+  type?: "booking" | "walk-in";
 }
 
 interface WaitListBoardProps {
@@ -28,46 +32,40 @@ interface WaitListBoardProps {
 }
 
 const WaitListBoard = ({
-  customers = [
-    {
-      id: "1",
-      name: "John Smith",
-      status: "online",
-      estimatedWaitTime: 15,
-      checkInTime: new Date(Date.now() - 10 * 60000),
-    },
-    {
-      id: "2",
-      name: "Sarah Johnson",
-      status: "in-store",
-      estimatedWaitTime: 25,
-      checkInTime: new Date(Date.now() - 5 * 60000),
-    },
-    {
-      id: "3",
-      name: "Michael Brown",
-      status: "online",
-      estimatedWaitTime: 35,
-      checkInTime: new Date(),
-    },
-    {
-      id: "4",
-      name: "Emily Davis",
-      status: "in-store",
-      estimatedWaitTime: 45,
-      checkInTime: new Date(),
-    },
-    {
-      id: "5",
-      name: "David Wilson",
-      status: "online",
-      estimatedWaitTime: 55,
-      checkInTime: new Date(),
-    },
-  ],
+  customers,
   onSort = () => {},
   onSearch = () => {},
 }: WaitListBoardProps) => {
+  // Combine bookings and walk-ins for display
+  const defaultCustomers: Customer[] = [
+    // Today's bookings that are in progress or confirmed
+    ...mockBookings
+      .filter(booking =>
+        booking.date === new Date().toISOString().split('T')[0] &&
+        ['confirmed', 'in-progress'].includes(booking.status)
+      )
+      .map(booking => ({
+        id: booking.id,
+        name: booking.customerName,
+        status: booking.status === 'in-progress' ? 'in-store' as const : 'online' as const,
+        estimatedWaitTime: booking.duration,
+        checkInTime: new Date(`${booking.date}T${booking.time}`),
+        service: booking.services.map(s => s.name).join(', '),
+        type: 'booking' as const
+      })),
+    // Walk-in customers from queue
+    ...mockCustomersQueue.map(customer => ({
+      id: customer.id.toString(),
+      name: customer.name,
+      status: customer.inStore ? 'in-store' as const : 'online' as const,
+      estimatedWaitTime: customer.estimatedWaitTime,
+      checkInTime: new Date(customer.checkInTime),
+      service: customer.requestedService,
+      type: 'walk-in' as const
+    }))
+  ];
+
+  const displayCustomers = customers || defaultCustomers;
   const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Customer | null;
@@ -139,7 +137,7 @@ const WaitListBoard = ({
           </TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[250px]">
+              <TableHead className="w-[200px]">
                 <div
                   className="flex items-center cursor-pointer"
                   onClick={() => handleSort("name")}
@@ -148,6 +146,7 @@ const WaitListBoard = ({
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </div>
               </TableHead>
+              <TableHead>Service</TableHead>
               <TableHead>
                 <div
                   className="flex items-center cursor-pointer"
@@ -157,12 +156,13 @@ const WaitListBoard = ({
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </div>
               </TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>
                 <div
                   className="flex items-center cursor-pointer"
                   onClick={() => handleSort("estimatedWaitTime")}
                 >
-                  Estimated Wait Time
+                  Wait Time
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </div>
               </TableHead>
@@ -178,11 +178,19 @@ const WaitListBoard = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {customers.length > 0 ? (
-              customers.map((customer) => (
+            {displayCustomers.length > 0 ? (
+              displayCustomers.map((customer) => (
                 <TableRow key={customer.id}>
                   <TableCell className="font-medium">{customer.name}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {customer.service || 'Not specified'}
+                  </TableCell>
                   <TableCell>{getStatusBadge(customer.status)}</TableCell>
+                  <TableCell>
+                    <Badge variant={customer.type === 'booking' ? 'default' : 'outline'}>
+                      {customer.type === 'booking' ? 'Appointment' : 'Walk-in'}
+                    </Badge>
+                  </TableCell>
                   <TableCell>
                     {formatTime(customer.estimatedWaitTime)}
                   </TableCell>
@@ -194,7 +202,7 @@ const WaitListBoard = ({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={6}
                   className="text-center py-6 text-gray-500"
                 >
                   No customers in the wait list

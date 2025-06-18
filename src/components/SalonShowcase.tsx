@@ -21,19 +21,19 @@ const SalonShowcase = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
               size="lg"
-              onClick={() => navigate("/check-in")}
+              onClick={() => navigate("/book")}
               className="text-lg"
             >
-              Check In Now
+              Book Appointment
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
               variant="outline"
               size="lg"
-              onClick={() => navigate("/services")}
+              onClick={() => navigate("/check-in")}
               className="text-lg"
             >
-              View Services
+              Walk-in Check In
             </Button>
           </div>
         </div>
