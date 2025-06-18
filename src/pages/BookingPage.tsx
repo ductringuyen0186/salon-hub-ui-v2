@@ -38,44 +38,44 @@ const BookingPage = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Info Bar */}
-          <div className="bg-dynamic-surface border border-dynamic-border rounded-2xl p-6 mb-8 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
+          <div className="bg-dynamic-surface border border-dynamic-border rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full sm:w-auto">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-dynamic-primary/10 rounded-full flex items-center justify-center">
-                    <Users className="h-5 w-5 text-dynamic-primary" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-dynamic-primary/10 rounded-full flex items-center justify-center">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5 text-dynamic-primary" />
                   </div>
                   <div>
-                    <span className="font-light text-dynamic-text text-lg">Available Today</span>
-                    <p className="text-dynamic-primary font-medium">{availableEmployees.length} Expert Technicians</p>
+                    <span className="font-light text-dynamic-text text-base sm:text-lg">Available Today</span>
+                    <p className="text-dynamic-primary font-medium text-sm sm:text-base">{availableEmployees.length} Expert Technicians</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-dynamic-accent/10 rounded-full flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-dynamic-accent" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-dynamic-accent/10 rounded-full flex items-center justify-center">
+                    <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-dynamic-accent" />
                   </div>
                   <div>
-                    <span className="font-light text-dynamic-text text-lg">Open Daily</span>
-                    <p className="text-dynamic-accent font-medium">9:00 AM - 7:00 PM</p>
+                    <span className="font-light text-dynamic-text text-base sm:text-lg">Open Daily</span>
+                    <p className="text-dynamic-accent font-medium text-sm sm:text-base">9:00 AM - 7:00 PM</p>
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
+              <div className="w-full sm:w-auto text-center sm:text-right">
+                <div className="bg-green-100 text-green-800 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium">
                   Walk-ins Always Welcome
                 </div>
               </div>
             </div>
           </div>
-          {/* Luxury Service Overview */}
-          <div className="mb-12">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-light text-dynamic-text mb-3">Curated Wellness Experiences</h2>
-              <p className="text-dynamic-text-secondary font-light max-w-2xl mx-auto">
+          {/* Service Overview */}
+          <div className="mb-8 sm:mb-12">
+            <div className="text-center mb-6 sm:mb-8 px-4">
+              <h2 className="text-2xl sm:text-3xl font-light text-dynamic-text mb-3">Curated Wellness Experiences</h2>
+              <p className="text-sm sm:text-base text-dynamic-text-secondary font-light max-w-2xl mx-auto">
                 Discover our signature treatments and meet our expert artisans dedicated to your beauty and wellness journey.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
               {/* Popular Services */}
               <Card className="bg-dynamic-surface border-dynamic-border shadow-sm hover:shadow-md transition-all duration-300">
                 <CardHeader className="pb-4">
@@ -167,49 +167,51 @@ const BookingPage = () => {
             </div>
           </div>
 
-          {/* Luxury Booking Options */}
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-light text-dynamic-text mb-3">Choose Your Experience</h2>
-            <p className="text-dynamic-text-secondary font-light max-w-2xl mx-auto">
+          {/* Booking Options */}
+          <div className="text-center mb-6 sm:mb-8 px-4">
+            <h2 className="text-2xl sm:text-3xl font-light text-dynamic-text mb-3">Choose Your Experience</h2>
+            <p className="text-sm sm:text-base text-dynamic-text-secondary font-light max-w-2xl mx-auto">
               Select your preferred booking method for the perfect spa experience tailored to your schedule.
             </p>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-12 bg-dynamic-surface border border-dynamic-border rounded-xl p-1 shadow-sm">
+            <TabsList className="grid w-full grid-cols-2 mb-8 sm:mb-12 bg-dynamic-surface border border-dynamic-border rounded-xl p-1 shadow-sm">
               <TabsTrigger
                 value="appointment"
-                className="flex items-center gap-3 py-3 px-4 rounded-lg font-light text-lg data-[state=active]:bg-dynamic-primary data-[state=active]:text-white transition-all duration-300"
+                className="flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-light text-sm sm:text-base lg:text-lg data-[state=active]:bg-dynamic-primary data-[state=active]:text-white transition-all duration-300"
               >
                 <Calendar className="h-4 w-4" />
-                Schedule Appointment
+                <span className="hidden sm:inline">Schedule Appointment</span>
+                <span className="sm:hidden">Schedule</span>
               </TabsTrigger>
               <TabsTrigger
                 value="walkin"
-                className="flex items-center gap-3 py-3 px-4 rounded-lg font-light text-lg data-[state=active]:bg-dynamic-primary data-[state=active]:text-white transition-all duration-300"
+                className="flex items-center justify-center gap-2 sm:gap-3 py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-light text-sm sm:text-base lg:text-lg data-[state=active]:bg-dynamic-primary data-[state=active]:text-white transition-all duration-300"
               >
                 <Clock className="h-4 w-4" />
-                Walk-in Check-in
+                <span className="hidden sm:inline">Walk-in Check-in</span>
+                <span className="sm:hidden">Walk-in</span>
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="appointment">
               <div className="space-y-8">
                 <Card className="bg-dynamic-surface border-dynamic-border shadow-sm">
-                  <CardHeader className="text-center pb-6">
-                    <CardTitle className="flex items-center justify-center gap-3 text-dynamic-text text-2xl font-light">
-                      <div className="w-12 h-12 bg-dynamic-primary/10 rounded-full flex items-center justify-center">
-                        <Calendar className="h-6 w-6 text-dynamic-primary" />
+                  <CardHeader className="text-center pb-4 sm:pb-6 px-4">
+                    <CardTitle className="flex flex-col sm:flex-row items-center justify-center gap-3 text-dynamic-text text-xl sm:text-2xl font-light">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-dynamic-primary/10 rounded-full flex items-center justify-center">
+                        <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-dynamic-primary" />
                       </div>
-                      Reserve Your Wellness Experience
+                      <span className="text-center sm:text-left">Reserve Your Wellness Experience</span>
                     </CardTitle>
-                    <CardDescription className="text-dynamic-text-secondary font-light text-lg max-w-2xl mx-auto">
+                    <CardDescription className="text-dynamic-text-secondary font-light text-base sm:text-lg max-w-2xl mx-auto px-4">
                       Secure your preferred time slot and technician for a guaranteed, personalized spa experience.
                       Perfect for planning your wellness journey with complete peace of mind.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <CardContent className="px-4 sm:px-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
                       <div className="flex items-center gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
                         <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                           <CheckCircle className="h-5 w-5 text-green-600" />
@@ -251,20 +253,20 @@ const BookingPage = () => {
             <TabsContent value="walkin">
               <div className="space-y-8">
                 <Card className="bg-dynamic-surface border-dynamic-border shadow-sm">
-                  <CardHeader className="text-center pb-6">
-                    <CardTitle className="flex items-center justify-center gap-3 text-dynamic-text text-2xl font-light">
-                      <div className="w-12 h-12 bg-dynamic-accent/10 rounded-full flex items-center justify-center">
-                        <Clock className="h-6 w-6 text-dynamic-accent" />
+                  <CardHeader className="text-center pb-4 sm:pb-6 px-4">
+                    <CardTitle className="flex flex-col sm:flex-row items-center justify-center gap-3 text-dynamic-text text-xl sm:text-2xl font-light">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-dynamic-accent/10 rounded-full flex items-center justify-center">
+                        <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-dynamic-accent" />
                       </div>
-                      Join Our Wellness Queue
+                      <span className="text-center sm:text-left">Join Our Wellness Queue</span>
                     </CardTitle>
-                    <CardDescription className="text-dynamic-text-secondary font-light text-lg max-w-2xl mx-auto">
+                    <CardDescription className="text-dynamic-text-secondary font-light text-base sm:text-lg max-w-2xl mx-auto px-4">
                       Experience spontaneous luxury with our walk-in service. Perfect for when you're ready to indulge
                       in immediate wellness and beauty care.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <CardContent className="px-4 sm:px-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
                       <div className="flex items-center gap-4 p-4 bg-yellow-50 rounded-xl border border-yellow-100">
                         <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
                           <AlertCircle className="h-5 w-5 text-yellow-600" />
