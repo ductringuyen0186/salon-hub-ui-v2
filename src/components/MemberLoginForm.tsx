@@ -24,7 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { UserIcon, KeyIcon, CheckCircleIcon, XCircleIcon, Settings } from "lucide-react";
-import api from "@/services/api";
+import { apiService } from "@/services/api";
 import { useNavigate } from "react-router-dom";
 import { setUserData, clearAuthData, type User } from "@/lib/auth";
 

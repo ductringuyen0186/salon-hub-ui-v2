@@ -21,7 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import api from "@/services/api";
+import { apiService } from "@/services/api";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 

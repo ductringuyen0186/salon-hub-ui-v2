@@ -46,7 +46,7 @@ import {
   UserCheck,
   RefreshCw,
 } from "lucide-react";
-import api from "@/services/api";
+import { apiService } from "@/services/api";
 import { isAdmin, isAuthenticated, clearAuthData } from "@/lib/auth";
 
 interface Customer {
