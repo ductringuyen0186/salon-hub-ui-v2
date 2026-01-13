@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import MemberLoginForm from "../components/MemberLoginForm";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Navigation from "../components/Navigation";
-import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,33 +18,6 @@ import {
 } from "lucide-react";
 
 const LoginPage = () => {
-  const { isAuthenticated, loading } = useAuth();
-  const navigate = useNavigate();
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      navigate('/', { replace: true });
-    }
-  }, [isAuthenticated, loading, navigate]);
-
-  // Show loading while checking authentication
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-dynamic-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-dynamic-primary mx-auto"></div>
-          <p className="mt-4 text-dynamic-text">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render if authenticated (will redirect)
-  if (isAuthenticated) {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-dynamic-background">
       <Navigation
@@ -82,8 +54,7 @@ const LoginPage = () => {
                     <Link to="/register">
                       <Button
                         variant="outline"
-                        className="text-white hover:opacity-90 transition-all duration-200 rounded-full px-6 py-2 border-0"
-                        style={{backgroundColor: '#d34000'}}
+                        className="border-dynamic-primary text-dynamic-primary hover:bg-dynamic-primary hover:text-white transition-colors rounded-full px-6 py-2"
                       >
                         <Crown className="h-4 w-4 mr-2" />
                         Become a Member
@@ -114,15 +85,15 @@ const LoginPage = () => {
 
               {/* Benefits Cards */}
               <div className="space-y-6">
-                <Card className="bg-gradient-to-r from-dynamic-primary/10 to-dynamic-primary/20 border-dynamic-primary/30 shadow-sm">
+                <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-dynamic-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Calendar className="h-6 w-6 text-dynamic-primary" />
+                      <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Calendar className="h-6 w-6 text-blue-600" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-dynamic-text mb-2">Priority Booking</h3>
-                        <p className="text-dynamic-text-secondary text-sm">
+                        <h3 className="font-medium text-gray-800 mb-2">Priority Booking</h3>
+                        <p className="text-gray-600 text-sm">
                           Skip the wait with priority scheduling and preferred appointment times
                         </p>
                       </div>
@@ -130,15 +101,15 @@ const LoginPage = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-dynamic-accent/10 to-dynamic-accent/20 border-dynamic-accent/30 shadow-sm">
+                <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200 shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-dynamic-accent/20 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Gift className="h-6 w-6 text-dynamic-accent" />
+                      <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Gift className="h-6 w-6 text-green-600" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-dynamic-text mb-2">Exclusive Discounts</h3>
-                        <p className="text-dynamic-text-secondary text-sm">
+                        <h3 className="font-medium text-gray-800 mb-2">Exclusive Discounts</h3>
+                        <p className="text-gray-600 text-sm">
                           Enjoy special member pricing and seasonal discount offers
                         </p>
                       </div>
@@ -146,15 +117,15 @@ const LoginPage = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-dynamic-primary/5 to-dynamic-accent/10 border-dynamic-border shadow-sm">
+                <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200 shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-dynamic-primary/15 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Heart className="h-6 w-6 text-dynamic-primary" />
+                      <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Heart className="h-6 w-6 text-purple-600" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-dynamic-text mb-2">Personalized Service</h3>
-                        <p className="text-dynamic-text-secondary text-sm">
+                        <h3 className="font-medium text-gray-800 mb-2">Personalized Service</h3>
+                        <p className="text-gray-600 text-sm">
                           Customized treatments based on your preferences and history
                         </p>
                       </div>
@@ -162,15 +133,15 @@ const LoginPage = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-dynamic-accent/5 to-dynamic-primary/10 border-dynamic-border shadow-sm">
+                <Card className="bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-dynamic-accent/20 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Star className="h-6 w-6 text-dynamic-accent" />
+                      <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Star className="h-6 w-6 text-yellow-600" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-dynamic-text mb-2">Loyalty Rewards</h3>
-                        <p className="text-dynamic-text-secondary text-sm">
+                        <h3 className="font-medium text-gray-800 mb-2">Loyalty Rewards</h3>
+                        <p className="text-gray-600 text-sm">
                           Earn points with every visit and redeem for free services
                         </p>
                       </div>
@@ -201,13 +172,13 @@ const LoginPage = () => {
 
           {/* Guest Access Section */}
           <div className="mt-16">
-            <Card className="bg-gradient-to-r from-dynamic-background to-dynamic-surface border-dynamic-border shadow-sm">
+            <Card className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 shadow-sm">
               <CardContent className="p-8 text-center">
-                <Users className="h-12 w-12 text-dynamic-text-secondary mx-auto mb-4" />
-                <h3 className="text-xl font-light text-dynamic-text mb-3">
+                <Users className="h-12 w-12 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-light text-gray-800 mb-3">
                   Visiting as a Guest?
                 </h3>
-                <p className="text-dynamic-text-secondary mb-6 max-w-2xl mx-auto">
+                <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
                   No problem! You can still enjoy our premium services. 
                   Check in as a walk-in guest or schedule an appointment online.
                 </p>
@@ -216,7 +187,7 @@ const LoginPage = () => {
                   <Link to="/check-in">
                     <Button
                       variant="outline"
-                      className="border-dynamic-border text-dynamic-text hover:border-dynamic-primary hover:text-dynamic-primary transition-colors rounded-full px-6 py-2 flex items-center gap-2"
+                      className="border-gray-300 text-gray-700 hover:border-dynamic-primary hover:text-dynamic-primary transition-colors rounded-full px-6 py-2 flex items-center gap-2"
                     >
                       <Users className="h-4 w-4" />
                       Walk-in Check In
@@ -225,8 +196,7 @@ const LoginPage = () => {
                   
                   <Link to="/booking">
                     <Button
-                      className="text-white hover:opacity-90 transition-all duration-200 rounded-full px-6 py-2 flex items-center gap-2"
-                      style={{backgroundColor: '#d34000'}}
+                      className="bg-dynamic-primary text-white hover:bg-dynamic-primary-hover transition-colors rounded-full px-6 py-2 flex items-center gap-2"
                     >
                       <Calendar className="h-4 w-4" />
                       Book Appointment

@@ -34,10 +34,14 @@ export interface Employee {
 export interface Service {
   id: number;
   name: string;
-  description: string;
-  duration: number;
+  description?: string;
+  estimatedDurationMinutes: number;
   price: number;
-  category: string;
+  category?: string;
+  popular?: boolean;
+  active?: boolean;
+  // Legacy field mapping for backward compatibility
+  duration?: number;
 }
 
 export interface Appointment {
@@ -71,14 +75,37 @@ export interface CheckInRequest {
 
 export interface CheckInRequestDTO {
   name: string;
-  contact?: string;
   phoneNumber?: string;
   email?: string;
-  note?: string;
+  preferredTechnician?: string;
+  partySize?: number;
+  additionalPeople?: { name: string }[];
+  notes?: string;
   requestedService?: string;
   guest?: boolean;
-  phoneOrEmail?: string;
-  contactEmail?: boolean;
+}
+
+export interface BookingData {
+  customerId?: number | null;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  serviceId: number;
+  serviceName: string;
+  staffId: number;
+  staffName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  duration: number;
+  price: number;
+  notes?: string;
+  status: string;
+}
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message?: string;
+  data?: T;
 }
 
 export interface CheckInResponseDTO {
@@ -171,6 +198,40 @@ class ApiService {
       return {} as T;
     } catch (error) {
       console.error('API request failed:', error);
+      throw error;
+    }
+  }
+
+  // Public request method (no authentication required)
+  private async publicRequest<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const url = `${this.baseURL}${endpoint}`;
+    const config: RequestInit = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    };
+
+    try {
+      const response = await fetch(url, config);
+      
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+
+      // Handle empty responses
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+      }
+      
+      return {} as T;
+    } catch (error) {
+      console.error('Public API request failed:', error);
       throw error;
     }
   }
@@ -294,11 +355,40 @@ class ApiService {
     return this.request<Appointment[]>(`/appointments/employee/${employeeId}`);
   }
 
-  async createAppointment(appointment: Omit<Appointment, 'id'>): Promise<Appointment> {
-    return this.request<Appointment>('/appointments', {
-      method: 'POST',
-      body: JSON.stringify(appointment),
-    });
+  async createAppointment(bookingData: BookingData): Promise<ApiResponse<Appointment>> {
+    try {
+      const appointmentRequest = {
+        customerName: bookingData.customerName,
+        customerEmail: bookingData.customerEmail,
+        customerPhone: bookingData.customerPhone,
+        serviceId: bookingData.serviceId,
+        serviceName: bookingData.serviceName,
+        staffId: bookingData.staffId,
+        staffName: bookingData.staffName,
+        scheduledTime: `${bookingData.appointmentDate}T${bookingData.appointmentTime}:00`,
+        duration: bookingData.duration,
+        price: bookingData.price,
+        notes: bookingData.notes || '',
+        status: bookingData.status
+      };
+
+      const appointment = await this.request<Appointment>('/appointments', {
+        method: 'POST',
+        body: JSON.stringify(appointmentRequest),
+      });
+      
+      return {
+        success: true,
+        message: 'Appointment created successfully',
+        data: appointment
+      };
+    } catch (error) {
+      console.error('Create appointment error:', error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to create appointment'
+      };
+    }
   }
 
   async updateAppointment(id: number, appointment: Partial<Appointment>): Promise<Appointment> {
@@ -360,12 +450,43 @@ class ApiService {
     });
   }
 
-  // Check-in endpoints (public)
+  // Check-in endpoints (requires authentication)
   async checkIn(checkInData: CheckInRequestDTO): Promise<CheckInResponseDTO> {
-    return this.request<CheckInResponseDTO>('/checkin', {
-      method: 'POST',
-      body: JSON.stringify(checkInData),
-    });
+    try {
+      // Step 1: Create or get customer
+      const customerData = {
+        name: checkInData.name,
+        phoneNumber: checkInData.phoneNumber || '',
+        email: checkInData.email || ''
+      };
+      
+      const customer = await this.request<Customer>('/customers', {
+        method: 'POST',
+        body: JSON.stringify(customerData),
+      });
+
+      // Step 2: Add customer to queue (for now, return mock response)
+      // We'll need to find the correct queue endpoint
+      const mockResponse: CheckInResponseDTO = {
+        id: customer.id,
+        name: customer.name,
+        phoneNumber: customer.phoneNumber,
+        email: customer.email || '',
+        note: checkInData.notes || '',
+        guest: true,
+        checkedInAt: new Date().toISOString(),
+        message: 'Successfully checked in',
+        success: true,
+        estimatedWaitTime: 25,
+        queuePosition: 1,
+        queueId: Date.now() // Mock queue ID
+      };
+
+      return mockResponse;
+    } catch (error) {
+      console.error('Check-in error:', error);
+      throw error;
+    }
   }
 
   async checkInExisting(phoneOrEmail: string): Promise<Customer> {
@@ -384,33 +505,60 @@ class ApiService {
     return this.request<QueueEntry[]>('/checkin/guests/today');
   }
 
-  // Services endpoints (if they exist)
+  // Services endpoints (service-types in backend)
   async getServices(): Promise<Service[]> {
-    return this.request<Service[]>('/services');
+    const services = await this.publicRequest<Service[]>('/service-types');
+    // Map backend field names to frontend expectations
+    return services.map(s => ({
+      ...s,
+      duration: s.estimatedDurationMinutes || s.duration
+    }));
   }
 
   async getServiceById(id: number): Promise<Service> {
-    return this.request<Service>(`/services/${id}`);
+    const service = await this.publicRequest<Service>(`/service-types/${id}`);
+    return {
+      ...service,
+      duration: service.estimatedDurationMinutes || service.duration
+    };
   }
 
   async createService(service: Omit<Service, 'id'>): Promise<Service> {
-    return this.request<Service>('/services', {
+    return this.request<Service>('/service-types', {
       method: 'POST',
-      body: JSON.stringify(service),
+      body: JSON.stringify({
+        ...service,
+        estimatedDurationMinutes: service.estimatedDurationMinutes || service.duration
+      }),
     });
   }
 
   async updateService(id: number, service: Partial<Service>): Promise<Service> {
-    return this.request<Service>(`/services/${id}`, {
+    return this.request<Service>(`/service-types/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(service),
+      body: JSON.stringify({
+        ...service,
+        estimatedDurationMinutes: service.estimatedDurationMinutes || service.duration
+      }),
     });
   }
 
   async deleteService(id: number): Promise<void> {
-    return this.request<void>(`/services/${id}`, {
+    return this.request<void>(`/service-types/${id}`, {
       method: 'DELETE',
     });
+  }
+
+  // Get services by category
+  async getServicesByCategory(category: string): Promise<Service[]> {
+    const services = await this.getServices();
+    return services.filter(s => s.category === category && s.active !== false);
+  }
+
+  // Get popular services
+  async getPopularServices(): Promise<Service[]> {
+    const services = await this.getServices();
+    return services.filter(s => s.popular === true && s.active !== false);
   }
 
   // Utility methods

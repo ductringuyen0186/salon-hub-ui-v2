@@ -427,7 +427,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
             {/* Submit Button */}
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full text-white hover:opacity-90 transition-all duration-200"
+              style={{backgroundColor: '#d34000'}}
               disabled={isLoading || selectedServices.length === 0}
             >
               {isLoading ? (

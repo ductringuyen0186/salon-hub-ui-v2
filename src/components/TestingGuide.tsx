@@ -56,14 +56,64 @@ const TestingGuide = () => {
             </AlertDescription>
           </Alert>
 
-          <Tabs defaultValue="accounts" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+          <Tabs defaultValue="routing" className="w-full">
+            <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="routing">Routing Tests</TabsTrigger>
               <TabsTrigger value="accounts">Test Accounts</TabsTrigger>
               <TabsTrigger value="queue">Mock Queue Data</TabsTrigger>
               <TabsTrigger value="booking">Booking System</TabsTrigger>
               <TabsTrigger value="colors">Color Themes</TabsTrigger>
               <TabsTrigger value="setup">Setup Instructions</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="routing" className="space-y-4">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Application Routes Test</h3>
+                <p className="text-sm text-muted-foreground">
+                  Test all application routes to ensure proper navigation and page loading.
+                </p>
+                
+                <div className="grid gap-3">
+                  {[
+                    { path: '/', name: 'Home Page', description: 'Main landing page with hero section' },
+                    { path: '/check-in', name: 'Check-In Page', description: 'Guest and member check-in forms' },
+                    { path: '/login', name: 'Login Page', description: 'User authentication' },
+                    { path: '/register', name: 'Register Page', description: 'New user registration' },
+                    { path: '/book', name: 'Booking Page', description: 'Service booking and appointments' },
+                    { path: '/services', name: 'Services Page', description: 'Available salon services' },
+                    { path: '/colors', name: 'Color Demo', description: 'Dynamic color theme showcase' },
+                    { path: '/waitlist', name: 'Wait List', description: 'Current queue status' },
+                    { path: '/admin', name: 'Admin Dashboard', description: 'Admin-only dashboard (requires login)' },
+                    { path: '/testing', name: 'Testing Guide', description: 'This testing documentation' },
+                  ].map((route) => (
+                    <Card key={route.path} className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <code className="bg-muted px-2 py-1 rounded text-sm">{route.path}</code>
+                            <span className="font-medium">{route.name}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{route.description}</p>
+                        </div>
+                        <Link to={route.path}>
+                          <Button variant="outline" size="sm">
+                            Test Route
+                          </Button>
+                        </Link>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+                
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Protected Routes:</strong> The admin routes require authentication with ADMIN or MANAGER role. 
+                    Test with admin credentials from the Test Accounts tab.
+                  </AlertDescription>
+                </Alert>
+              </div>
+            </TabsContent>
 
             <TabsContent value="accounts" className="space-y-4">
               <div className="flex items-center justify-between mb-4">
@@ -227,7 +277,7 @@ const TestingGuide = () => {
                   Test the dynamic color system that allows users to change the entire application's color scheme instantly.
                 </p>
                 <Link to="/colors">
-                  <Button className="w-full">
+                  <Button className="w-full" style={{backgroundColor: '#d34000'}}>
                     <Palette className="h-4 w-4 mr-2" />
                     Open Color Demo Page
                   </Button>

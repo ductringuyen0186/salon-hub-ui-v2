@@ -3,14 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Form,
   FormControl,
   FormField,
@@ -24,9 +16,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { UserIcon, KeyIcon, CheckCircleIcon, XCircleIcon, Settings } from "lucide-react";
-import { apiService } from "@/services/api";
-import { useNavigate } from "react-router-dom";
-import { setUserData, clearAuthData, type User } from "@/lib/auth";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -38,22 +29,12 @@ const loginFormSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginFormSchema>;
 
-interface MemberPreferences {
-  name: string;
-  email: string;
-  role: string;
-  preferredServices?: string[];
-  lastVisit?: string;
-}
-
 const MemberLoginForm = () => {
   const navigate = useNavigate();
+  const { login, isAuthenticated, user, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [checkInError, setCheckInError] = useState<string | null>(null);
-  const [memberPreferences, setMemberPreferences] =
-    useState<MemberPreferences | null>(null);
   const [isCheckedIn, setIsCheckedIn] = useState(false);
 
   const form = useForm<LoginFormValues>({
@@ -70,27 +51,10 @@ const MemberLoginForm = () => {
     setLoginError(null);
 
     try {
-      const response = await api.post('/auth/login', {
-        email: data.email,
-        password: data.password
-      });
-
-      const userData: User = {
-        name: response.data.user.name,
-        email: response.data.user.email,
-        role: response.data.user.role,
-        preferredServices: response.data.user.preferredServices ?
-          response.data.user.preferredServices.split(',').map((s: string) => s.trim()) : [],
-        lastVisit: response.data.user.lastVisit
-      };
-
-      setIsLoggedIn(true);
-      setMemberPreferences(userData);
-
-      // Store user data in localStorage for session management
-      setUserData(userData, response.data.accessToken);
+      await login(data.email, data.password);
+      // AuthContext will handle the user state and redirect will happen in LoginPage
     } catch (error: any) {
-      setLoginError(error.response?.data?.message || "Invalid email or password");
+      setLoginError(error.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
     }
@@ -101,58 +65,26 @@ const MemberLoginForm = () => {
     setCheckInError(null);
 
     try {
-      const response = await api.post('/checkin', {
-        email: memberPreferences?.email,
-        isGuest: false
-      });
-
-      if (response.data.success) {
-        setIsCheckedIn(true);
-      } else {
-        setCheckInError(response.data.message || "Check-in failed");
-      }
+      // Navigate to check-in page - user is already authenticated
+      navigate('/check-in');
     } catch (error: any) {
-      console.error("Check-in failed:", error);
-      setCheckInError(error.response?.data?.message || "Check-in failed. Please try again.");
+      console.error("Check-in navigation failed:", error);
+      setCheckInError(error.message || "Check-in failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setIsCheckedIn(false);
-    setMemberPreferences(null);
-    setLoginError(null);
-    setCheckInError(null);
-    clearAuthData();
-    form.reset();
-  };
-
-  const handleAdminToggle = () => {
-    navigate('/admin');
-  };
-
   return (
-    <Card className="w-full max-w-md mx-auto bg-white">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">
-          Member Login
-        </CardTitle>
-        <CardDescription className="text-center">
-          Login to your account for quick check-in and access to your
-          preferences
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {!isLoggedIn ? (
-          <>
-            {loginError && (
-              <Alert variant="destructive" className="mb-4">
-                <XCircleIcon className="h-4 w-4" />
-                <AlertDescription>{loginError}</AlertDescription>
-              </Alert>
-            )}
+    <div className="w-full">
+      {!isAuthenticated ? (
+        <div className="space-y-6">
+          {loginError && (
+            <Alert variant="destructive" className="mb-4">
+              <XCircleIcon className="h-4 w-4" />
+              <AlertDescription>{loginError}</AlertDescription>
+            </Alert>
+          )}
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -166,10 +98,10 @@ const MemberLoginForm = () => {
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <UserIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <UserIcon className="absolute left-3 top-2.5 h-5 w-5 text-dynamic-text-secondary" />
                           <Input
                             placeholder="your.email@example.com"
-                            className="pl-10"
+                            className="pl-10 h-12 rounded-xl border-dynamic-border focus:border-dynamic-primary"
                             {...field}
                           />
                         </div>
@@ -186,11 +118,11 @@ const MemberLoginForm = () => {
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <KeyIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <KeyIcon className="absolute left-3 top-2.5 h-5 w-5 text-dynamic-text-secondary" />
                           <Input
                             type="password"
                             placeholder="••••••••"
-                            className="pl-10"
+                            className="pl-10 h-12 rounded-xl border-dynamic-border focus:border-dynamic-primary"
                             {...field}
                           />
                         </div>
@@ -216,124 +148,76 @@ const MemberLoginForm = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full text-white transition-all duration-200 border-0 rounded-xl h-12 font-medium hover:opacity-90" 
+                  style={{backgroundColor: '#d34000'}}
+                  disabled={isLoading}
+                >
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
               </form>
             </Form>
             <div className="mt-4 text-center text-sm">
-              <a href="#" className="text-primary hover:underline">
+              <a href="#" className="text-dynamic-primary hover:underline">
                 Forgot password?
               </a>
-              <Separator className="my-4" />
-              <p>
-                Don't have an account?{" "}
-                <a href="#" className="text-primary hover:underline">
-                  Sign up
-                </a>
-              </p>
             </div>
-          </>
-        ) : (
-          <div className="space-y-4">
-            {isCheckedIn ? (
-              <div className="text-center p-4 space-y-4">
-                <CheckCircleIcon className="h-16 w-16 text-green-500 mx-auto" />
-                <h3 className="text-xl font-medium">Check-in Successful!</h3>
-                <p>You've been added to the wait list.</p>
-                <div className="bg-muted p-3 rounded-md">
-                  <p className="font-medium">Estimated wait time:</p>
-                  <p className="text-2xl font-bold">25 minutes</p>
-                </div>
-                <div className="space-y-2 mt-4">
-                  {memberPreferences?.role === 'ADMIN' && (
-                    <Button
-                      onClick={handleAdminToggle}
-                      variant="secondary"
-                      className="w-full"
-                      disabled={isLoading}
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Admin Dashboard
-                    </Button>
-                  )}
-                  <Button
-                    onClick={handleLogout}
-                    variant="outline"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    Logout
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="text-center mb-4">
-                  <h3 className="text-xl font-medium">
-                    Welcome back, {memberPreferences?.name}!
-                  </h3>
-                </div>
-                {checkInError && (
-                  <Alert variant="destructive" className="mb-4">
-                    <XCircleIcon className="h-4 w-4" />
-                    <AlertDescription>{checkInError}</AlertDescription>
-                  </Alert>
-                )}
-                <div className="bg-muted p-4 rounded-md space-y-3">
-                  <h4 className="font-medium">Your Preferences</h4>
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Preferred Services:
-                    </p>
-                    <p>{memberPreferences?.preferredServices && memberPreferences.preferredServices.length > 0
-                        ? memberPreferences.preferredServices.join(", ")
-                        : "No preferences set"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Last Visit:</p>
-                    <p>{memberPreferences?.lastVisit || "No previous visits"}</p>
-                  </div>
-                </div>
-                <div className="space-y-2 mt-4">
-                  <Button
-                    onClick={handleCheckIn}
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Processing..." : "Check In Now"}
-                  </Button>
-                  {memberPreferences?.role === 'ADMIN' && (
-                    <Button
-                      onClick={handleAdminToggle}
-                      variant="secondary"
-                      className="w-full"
-                      disabled={isLoading}
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Admin Dashboard
-                    </Button>
-                  )}
-                  <Button
-                    onClick={handleLogout}
-                    variant="outline"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    Logout
-                  </Button>
-                </div>
-              </>
+            <div className="mt-4 text-center text-sm pt-4 border-t border-dynamic-border">
+              <span className="text-dynamic-text-secondary">Don't have an account? </span>
+              <Link to="/register" className="text-dynamic-primary hover:text-dynamic-primary-hover transition-colors font-medium underline">
+                Sign up
+              </Link>
+            </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="text-center p-4 space-y-4">
+            <CheckCircleIcon className="h-16 w-16 text-green-500 mx-auto" />
+            <h3 className="text-xl font-medium">
+              Welcome back, {user?.name || 'User'}!
+            </h3>
+            <p>You are already logged in.</p>
+            
+            {checkInError && (
+              <Alert variant="destructive" className="mb-4">
+                <XCircleIcon className="h-4 w-4" />
+                <AlertDescription>{checkInError}</AlertDescription>
+              </Alert>
             )}
+            
+            <div className="space-y-2 mt-4">
+              <Button
+                onClick={handleCheckIn}
+                className="w-full text-white transition-all duration-200 border-0 rounded-xl h-12 font-medium hover:opacity-90"
+                style={{backgroundColor: '#d34000'}}
+                disabled={isLoading}
+              >
+                {isLoading ? "Processing..." : "Check In Now"}
+              </Button>
+              
+              {user?.role === 'ADMIN' && (
+                <Button
+                  onClick={() => navigate('/admin')}
+                  variant="secondary"
+                  className="w-full bg-dynamic-primary/10 text-dynamic-text hover:bg-dynamic-primary/20 transition-all duration-200 border border-dynamic-primary/20 rounded-xl"
+                  disabled={isLoading}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Admin Dashboard
+                </Button>
+              )}
+            </div>
           </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex justify-center border-t pt-4">
-        <p className="text-xs text-muted-foreground">
+        </div>
+      )}
+        
+      <div className="text-center mt-6 pt-6 border-t border-dynamic-border">
+        <p className="text-xs text-dynamic-text-secondary font-light">
           By logging in, you agree to our Terms of Service and Privacy Policy
         </p>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
 

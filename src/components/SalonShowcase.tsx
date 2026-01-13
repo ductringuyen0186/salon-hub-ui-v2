@@ -22,7 +22,8 @@ const SalonShowcase = () => {
             <Button
               size="lg"
               onClick={() => navigate("/book")}
-              className="text-lg"
+              className="text-lg text-white hover:opacity-90 transition-all duration-200"
+              style={{backgroundColor: '#d34000'}}
             >
               Book Appointment
               <ArrowRight className="ml-2 h-5 w-5" />

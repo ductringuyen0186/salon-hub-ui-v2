@@ -13,7 +13,7 @@
       --popover: 0 0% 100%;
       --popover-foreground: 222.2 84% 4.9%;
 
-      --primary: 222.2 47.4% 11.2%;
+      --primary: 16 79% 41%;
       --primary-foreground: 210 40% 98%;
 
       --secondary: 210 40% 96.1%;
@@ -30,7 +30,7 @@
 
       --border: 214.3 31.8% 91.4%;
       --input: 214.3 31.8% 91.4%;
-      --ring: 222.2 84% 4.9%;
+      --ring: 16 79% 41%;
 
       --radius: 0.5rem;
     }
@@ -45,8 +45,8 @@
       --popover: 222.2 84% 4.9%;
       --popover-foreground: 210 40% 98%;
 
-      --primary: 210 40% 98%;
-      --primary-foreground: 222.2 47.4% 11.2%;
+      --primary: 16 79% 41%;
+      --primary-foreground: 210 40% 98%;
 
       --secondary: 217.2 32.6% 17.5%;
       --secondary-foreground: 210 40% 98%;
@@ -62,7 +62,7 @@
 
       --border: 217.2 32.6% 17.5%;
       --input: 217.2 32.6% 17.5%;
-      --ring: 212.7 26.8% 83.9%;
+      --ring: 16 79% 41%;
     }
   }
 
@@ -77,16 +77,16 @@
 
 /* Dynamic Color System */
 :root {
-  /* Default theme colors (Pastel Rose) */
-  --color-primary: #f8a5c2;
-  --color-primary-hover: #f48fb1;
-  --color-secondary: #d4b5a0;
-  --color-background: #fef7f7;
+  /* New branded theme colors based on #d34000 */
+  --color-primary: #d34000;
+  --color-primary-hover: #b8380a;
+  --color-secondary: #f59e0b;
+  --color-background: #fafafa;
   --color-surface: #ffffff;
-  --color-text: #2d3748;
-  --color-text-secondary: #718096;
-  --color-border: #f1e8e8;
-  --color-accent: #fbb6ce;
+  --color-text: #111827;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --color-accent: #f59e0b;
 }
 
 /* Dynamic color utility classes */

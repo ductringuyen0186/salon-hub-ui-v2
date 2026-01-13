@@ -1,112 +1,159 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Star, Calendar, Sparkles, ArrowRight, Users, Award, CheckCircle, Scissors, Crown, Palette, Loader2 } from "lucide-react";
-import { apiService, Service } from "@/services/api";
-
-// Icon mapping for categories
-const categoryIcons: Record<string, React.ReactNode> = {
-  "Manicure Services": <Scissors className="h-8 w-8" />,
-  "Pedicure Services": <Sparkles className="h-8 w-8" />,
-  "Nail Enhancements": <Crown className="h-8 w-8" />,
-  "Nail Art & Design": <Palette className="h-8 w-8" />,
-  "Add-On Services": <CheckCircle className="h-8 w-8" />,
-  "Combo Packages": <Award className="h-8 w-8" />,
-};
-
-// Category colors for styling
-const categoryColors: Record<string, string> = {
-  "Manicure Services": "bg-dynamic-primary/10 border-dynamic-primary/20",
-  "Pedicure Services": "bg-dynamic-accent/10 border-dynamic-accent/20",
-  "Nail Enhancements": "bg-dynamic-primary/5 border-dynamic-border",
-  "Nail Art & Design": "bg-dynamic-accent/5 border-dynamic-accent/15",
-  "Add-On Services": "bg-dynamic-primary/5 border-dynamic-primary/10",
-  "Combo Packages": "bg-gradient-to-r from-dynamic-primary/10 to-dynamic-accent/10 border-dynamic-border",
-};
-
-// Category descriptions
-const categoryDescriptions: Record<string, string> = {
-  "Manicure Services": "Professional nail care for beautiful, healthy hands",
-  "Pedicure Services": "Rejuvenating foot treatments for complete relaxation",
-  "Nail Enhancements": "Extensions and strengthening for gorgeous, long-lasting nails",
-  "Nail Art & Design": "Creative artistic designs for unique, personalized nails",
-  "Add-On Services": "Enhance your experience with luxurious add-on treatments",
-  "Combo Packages": "Save with our curated service combinations",
-};
-
-interface ServiceCategory {
-  category: string;
-  services: Service[];
-  icon: React.ReactNode;
-  color: string;
-  description: string;
-}
+import { Clock, Star, Calendar, Sparkles, ArrowRight, Users, Award, CheckCircle, Scissors, Crown, Palette } from "lucide-react";
 
 const ServicesPage = () => {
   const navigate = useNavigate();
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        setLoading(true);
-        const data = await apiService.getServices();
-        // Filter only active services
-        setServices(data.filter(s => s.active !== false));
-        setError(null);
-      } catch (err) {
-        console.error('Failed to fetch services:', err);
-        setError('Unable to load services. Please try again later.');
-        // Keep empty array - no fallback to hardcoded data
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Enhanced service data with better organization
+  const serviceCategories = [
+    {
+      id: 1,
+      icon: <Scissors className="h-8 w-8" />,
+      category: "Manicure Services",
+      description: "Professional nail care for beautiful, healthy hands",
+      color: "bg-blue-50 border-blue-200",
+      services: [
+        { 
+          name: "Signature Manicure", 
+          price: 45, 
+          duration: 60, 
+          description: "Complete nail care with cuticle treatment, shaping, and luxury hand massage",
+          popular: true 
+        },
+        { 
+          name: "Express Manicure", 
+          price: 25, 
+          duration: 30, 
+          description: "Quick nail shaping, cuticle care, and polish application" 
+        },
+        { 
+          name: "Gel Manicure", 
+          price: 35, 
+          duration: 45, 
+          description: "Long-lasting gel polish with chip-resistant finish" 
+        },
+        { 
+          name: "French Manicure", 
+          price: 40, 
+          duration: 50, 
+          description: "Classic French tips with precision and elegance" 
+        },
+      ],
+    },
+    {
+      id: 2,
+      icon: <Sparkles className="h-8 w-8" />,
+      category: "Pedicure Services", 
+      description: "Rejuvenating foot treatments for complete relaxation",
+      color: "bg-green-50 border-green-200",
+      services: [
+        { 
+          name: "Deluxe Pedicure", 
+          price: 65, 
+          duration: 75, 
+          description: "Ultimate foot treatment with exfoliation, hot stone massage, and paraffin",
+          popular: true 
+        },
+        { 
+          name: "Classic Pedicure", 
+          price: 35, 
+          duration: 45, 
+          description: "Essential foot care with nail trimming, shaping, and polish" 
+        },
+        { 
+          name: "Spa Pedicure", 
+          price: 50, 
+          duration: 60, 
+          description: "Relaxing treatment with callus removal and foot massage" 
+        },
+        { 
+          name: "Medical Pedicure", 
+          price: 70, 
+          duration: 60, 
+          description: "Therapeutic treatment for foot health and nail care" 
+        },
+      ],
+    },
+    {
+      id: 3,
+      icon: <Crown className="h-8 w-8" />,
+      category: "Nail Enhancements",
+      description: "Extensions and strengthening for gorgeous, long-lasting nails",
+      color: "bg-purple-50 border-purple-200",
+      services: [
+        { 
+          name: "Acrylic Full Set", 
+          price: 55, 
+          duration: 90, 
+          description: "Complete acrylic nail application with custom shaping and length" 
+        },
+        { 
+          name: "Gel Extensions", 
+          price: 60, 
+          duration: 90, 
+          description: "Natural-looking gel extensions with superior durability" 
+        },
+        { 
+          name: "Dip Powder", 
+          price: 45, 
+          duration: 60, 
+          description: "Healthy nail strengthening with beautiful color finish" 
+        },
+        { 
+          name: "Fill & Maintenance", 
+          price: 35, 
+          duration: 45, 
+          description: "Professional maintenance for existing nail enhancements" 
+        },
+      ],
+    },
+    {
+      id: 4,
+      icon: <Palette className="h-8 w-8" />,
+      category: "Nail Art & Design",
+      description: "Creative artistic designs for unique, personalized nails",
+      color: "bg-pink-50 border-pink-200",
+      services: [
+        { 
+          name: "Custom Nail Art", 
+          price: 15, 
+          duration: 30, 
+          description: "Per nail artistic design created by our talented artists",
+          popular: true 
+        },
+        { 
+          name: "3D Nail Art", 
+          price: 25, 
+          duration: 45, 
+          description: "Dimensional artwork with gems, charms, and textures" 
+        },
+        { 
+          name: "Seasonal Designs", 
+          price: 20, 
+          duration: 35, 
+          description: "Trendy seasonal themes and holiday-inspired art" 
+        },
+        { 
+          name: "Bridal Package", 
+          price: 150, 
+          duration: 120, 
+          description: "Complete bridal nail service with trial and wedding day application" 
+        },
+      ],
+    },
+  ];
 
-    fetchServices();
-  }, []);
-
-  // Group services by category
-  const serviceCategories: ServiceCategory[] = React.useMemo(() => {
-    const categoryMap = new Map<string, Service[]>();
-    
-    services.forEach(service => {
-      const cat = service.category || 'Other Services';
-      if (!categoryMap.has(cat)) {
-        categoryMap.set(cat, []);
-      }
-      categoryMap.get(cat)!.push(service);
-    });
-
-    // Define category order
-    const categoryOrder = [
-      "Manicure Services",
-      "Pedicure Services", 
-      "Nail Enhancements",
-      "Nail Art & Design",
-      "Add-On Services",
-      "Combo Packages",
-    ];
-
-    return categoryOrder
-      .filter(cat => categoryMap.has(cat))
-      .map(cat => ({
-        category: cat,
-        services: categoryMap.get(cat)!,
-        icon: categoryIcons[cat] || <Sparkles className="h-8 w-8" />,
-        color: categoryColors[cat] || "bg-dynamic-surface border-dynamic-border",
-        description: categoryDescriptions[cat] || "",
-      }));
-  }, [services]);
-
-  // Separate add-on services for special display
-  const addOnServices = services.filter(s => s.category === "Add-On Services");
-  const mainCategories = serviceCategories.filter(c => c.category !== "Add-On Services" && c.category !== "Combo Packages");
+  const addOnServices = [
+    { name: "Cuticle Oil Treatment", price: 5, description: "Nourishing treatment for healthy cuticles" },
+    { name: "Hand Mask", price: 10, description: "Moisturizing mask for soft, smooth hands" },
+    { name: "Paraffin Treatment", price: 15, description: "Therapeutic wax treatment for deep moisturizing" },
+    { name: "Hot Stone Massage", price: 20, description: "Relaxing hot stone therapy for hands and arms" },
+  ];
 
   return (
     <div className="min-h-screen bg-dynamic-background">
@@ -136,8 +183,7 @@ const ServicesPage = () => {
 
             <Button
               onClick={() => navigate("/booking")}
-              className="text-white px-8 py-3 rounded-full hover:opacity-90 transition-all duration-300 text-lg flex items-center gap-2 mx-auto"
-              style={{backgroundColor: '#d34000'}}
+              className="bg-dynamic-primary text-white px-8 py-3 rounded-full hover:bg-dynamic-primary-hover transition-all duration-300 text-lg flex items-center gap-2 mx-auto"
             >
               <Calendar className="h-5 w-5" />
               Book Your Appointment
@@ -145,124 +191,97 @@ const ServicesPage = () => {
           </div>
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-dynamic-primary mb-4" />
-            <p className="text-dynamic-text-secondary">Loading services...</p>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && !loading && (
-          <div className="text-center py-20">
-            <p className="text-red-500 mb-4">{error}</p>
-            <Button 
-              onClick={() => window.location.reload()}
-              variant="outline"
-              className="border-dynamic-border"
-            >
-              Try Again
-            </Button>
-          </div>
-        )}
-
         {/* Service Categories */}
-        {!loading && !error && (
-          <div className="space-y-16">
-            {mainCategories.map((category) => (
-              <div key={category.category} className="space-y-8">
-                {/* Category Header */}
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    <div className="text-dynamic-primary">
-                      {category.icon}
-                    </div>
-                    <h2 className="text-3xl font-light text-dynamic-text">
-                      {category.category}
-                    </h2>
+        <div className="space-y-16">
+          {serviceCategories.map((category) => (
+            <div key={category.id} className="space-y-8">
+              {/* Category Header */}
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <div className="text-dynamic-primary">
+                    {category.icon}
                   </div>
-                  <p className="text-lg text-dynamic-text-secondary max-w-2xl mx-auto">
-                    {category.description}
-                  </p>
+                  <h2 className="text-3xl font-light text-dynamic-text">
+                    {category.category}
+                  </h2>
                 </div>
-
-                {/* Services Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {category.services.map((service) => (
-                    <Card 
-                      key={service.id} 
-                      className="bg-dynamic-surface border-dynamic-border shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-lg font-medium text-dynamic-text">{service.name}</h3>
-                              {service.popular && (
-                                <Badge className="bg-dynamic-accent/20 text-dynamic-accent border-dynamic-accent/30 text-xs">
-                                  Popular
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-dynamic-text-secondary text-sm mb-4 leading-relaxed">
-                              {service.description || 'Premium service'}
-                            </p>
-                            <div className="flex items-center gap-2 text-sm text-dynamic-text-secondary mb-4">
-                              <Clock className="h-4 w-4" />
-                              {service.estimatedDurationMinutes || service.duration} min
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="text-2xl font-semibold text-dynamic-primary">
-                            ${service.price}
-                          </div>
-                          <Button
-                            onClick={() => navigate("/booking")}
-                            size="sm"
-                            className="text-white rounded-full hover:opacity-90 transition-all duration-200"
-                            style={{backgroundColor: '#d34000'}}
-                          >
-                            Book Now
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                <p className="text-lg text-dynamic-text-secondary max-w-2xl mx-auto">
+                  {category.description}
+                </p>
               </div>
-            ))}
-          </div>
-        )}
+
+              {/* Services Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {category.services.map((service, index) => (
+                  <Card 
+                    key={index} 
+                    className="bg-dynamic-surface border-dynamic-border shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="text-lg font-medium text-dynamic-text">{service.name}</h3>
+                            {service.popular && (
+                              <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
+                                Popular
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-dynamic-text-secondary text-sm mb-4 leading-relaxed">
+                            {service.description}
+                          </p>
+                          <div className="flex items-center gap-2 text-sm text-dynamic-text-secondary mb-4">
+                            <Clock className="h-4 w-4" />
+                            {service.duration} min
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-semibold text-dynamic-primary">
+                          ${service.price}
+                        </div>
+                        <Button
+                          onClick={() => navigate("/booking")}
+                          size="sm"
+                          className="bg-dynamic-primary text-white rounded-full hover:bg-dynamic-primary-hover transition-colors"
+                        >
+                          Book Now
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Add-On Services */}
-        {!loading && !error && addOnServices.length > 0 && (
-          <div className="mt-20">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-light text-dynamic-text mb-4">
-                Enhancement Add-Ons
-              </h2>
-              <p className="text-lg text-dynamic-text-secondary max-w-2xl mx-auto">
-                Enhance your experience with our luxurious add-on treatments
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {addOnServices.map((addon) => (
-                <Card key={addon.id} className="bg-gradient-to-br from-dynamic-primary/5 to-dynamic-accent/5 border-dynamic-border">
-                  <CardContent className="p-6 text-center">
-                    <CheckCircle className="h-8 w-8 text-dynamic-primary mx-auto mb-3" />
-                    <h3 className="text-lg font-medium text-dynamic-text mb-2">{addon.name}</h3>
-                    <p className="text-dynamic-text-secondary text-sm mb-3">{addon.description || 'Premium add-on service'}</p>
-                    <div className="text-xl font-semibold text-dynamic-primary">+${addon.price}</div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+        <div className="mt-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-light text-dynamic-text mb-4">
+              Enhancement Add-Ons
+            </h2>
+            <p className="text-lg text-dynamic-text-secondary max-w-2xl mx-auto">
+              Enhance your experience with our luxurious add-on treatments
+            </p>
           </div>
-        )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {addOnServices.map((addon, index) => (
+              <Card key={index} className="bg-gradient-to-br from-dynamic-primary/5 to-dynamic-accent/5 border-dynamic-border">
+                <CardContent className="p-6 text-center">
+                  <CheckCircle className="h-8 w-8 text-dynamic-primary mx-auto mb-3" />
+                  <h3 className="text-lg font-medium text-dynamic-text mb-2">{addon.name}</h3>
+                  <p className="text-dynamic-text-secondary text-sm mb-3">{addon.description}</p>
+                  <div className="text-xl font-semibold text-dynamic-primary">+${addon.price}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
 
         {/* Packages Section */}
         <div className="mt-20">
@@ -309,8 +328,7 @@ const ServicesPage = () => {
                   <p className="text-sm text-dynamic-text-secondary mb-4">Save $25</p>
                   <Button
                     onClick={() => navigate("/booking")}
-                    className="w-full text-white rounded-full hover:opacity-90"
-                    style={{backgroundColor: '#d34000'}}
+                    className="w-full bg-dynamic-primary text-white rounded-full hover:bg-dynamic-primary-hover"
                   >
                     Book Package
                   </Button>
@@ -351,8 +369,7 @@ const ServicesPage = () => {
                   <p className="text-sm text-dynamic-text-secondary mb-4">Complete bridal experience</p>
                   <Button
                     onClick={() => navigate("/booking")}
-                    className="w-full text-white rounded-full hover:opacity-90"
-                    style={{backgroundColor: '#d34000'}}
+                    className="w-full bg-dynamic-primary text-white rounded-full hover:bg-dynamic-primary-hover"
                   >
                     Book Package
                   </Button>
@@ -393,8 +410,7 @@ const ServicesPage = () => {
                   <p className="text-sm text-dynamic-text-secondary mb-4">per month</p>
                   <Button
                     onClick={() => navigate("/booking")}
-                    className="w-full text-white rounded-full hover:opacity-90"
-                    style={{backgroundColor: '#d34000'}}
+                    className="w-full bg-dynamic-primary text-white rounded-full hover:bg-dynamic-primary-hover"
                   >
                     Join VIP
                   </Button>
@@ -419,8 +435,7 @@ const ServicesPage = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
                   onClick={() => navigate("/booking")}
-                  className="text-white px-8 py-3 rounded-full hover:opacity-90 transition-all duration-300 text-lg flex items-center gap-2 justify-center"
-                  style={{backgroundColor: '#d34000'}}
+                  className="bg-dynamic-primary text-white px-8 py-3 rounded-full hover:bg-dynamic-primary-hover transition-all duration-300 text-lg flex items-center gap-2 justify-center"
                 >
                   <Calendar className="h-5 w-5" />
                   Book Online Now

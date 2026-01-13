@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import CheckInForm from "@/components/CheckInForm";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { apiService } from "@/services/api";
-import AuthDebugger from "@/components/AuthDebugger";
 import { 
   UserCheck, 
   Users, 
@@ -17,51 +15,11 @@ import {
   Crown,
   Gift,
   Calendar,
-  Heart,
-  RefreshCw
+  Heart
 } from "lucide-react";
 
 const CheckInPage = () => {
   const [showMemberLogin, setShowMemberLogin] = useState(false);
-  const [queueStats, setQueueStats] = useState({
-    totalWaiting: 3,
-    averageWaitTime: 15,
-    loading: true
-  });
-  const [refreshing, setRefreshing] = useState(false);
-
-  // Fetch queue stats on component mount
-  useEffect(() => {
-    fetchQueueStats();
-    // Refresh stats every 30 seconds
-    const interval = setInterval(fetchQueueStats, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchQueueStats = async () => {
-    try {
-      const stats = await apiService.getQueueStats();
-      setQueueStats({
-        totalWaiting: stats.totalWaiting,
-        averageWaitTime: Math.round(stats.averageWaitTime),
-        loading: false
-      });
-    } catch (error) {
-      console.error('Failed to fetch queue stats:', error);
-      // Use fallback values
-      setQueueStats({
-        totalWaiting: 3,
-        averageWaitTime: 15,
-        loading: false
-      });
-    }
-  };
-
-  const handleRefreshStats = async () => {
-    setRefreshing(true);
-    await fetchQueueStats();
-    setRefreshing(false);
-  };
 
   if (showMemberLogin) {
     return (
@@ -134,9 +92,6 @@ const CheckInPage = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Debug Panel - Remove in production */}
-          <AuthDebugger />
-          
           {/* Welcome Section */}
           <div className="text-center mb-12">
             <div className="max-w-2xl mx-auto">
@@ -160,7 +115,7 @@ const CheckInPage = () => {
             {/* Guest Check-in */}
             <Card className="bg-dynamic-surface border-dynamic-border shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 bg-dynamic-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="h-8 w-8 text-blue-600" />
                 </div>
                 <CardTitle className="text-2xl font-light text-dynamic-text">Guest Check-In</CardTitle>
@@ -237,9 +192,7 @@ const CheckInPage = () => {
             <Card className="bg-dynamic-surface border-dynamic-border shadow-sm">
               <CardContent className="p-6 text-center">
                 <Clock className="h-8 w-8 text-dynamic-primary mx-auto mb-3" />
-                <div className="text-2xl font-semibold text-dynamic-text mb-1">
-                  {queueStats.loading ? '--' : `${queueStats.averageWaitTime} min`}
-                </div>
+                <div className="text-2xl font-semibold text-dynamic-text mb-1">15 min</div>
                 <div className="text-sm text-dynamic-text-secondary">Current Wait</div>
               </CardContent>
             </Card>
@@ -247,29 +200,14 @@ const CheckInPage = () => {
             <Card className="bg-dynamic-surface border-dynamic-border shadow-sm">
               <CardContent className="p-6 text-center">
                 <Users className="h-8 w-8 text-dynamic-primary mx-auto mb-3" />
-                <div className="text-2xl font-semibold text-dynamic-text mb-1">
-                  {queueStats.loading ? '--' : `${queueStats.totalWaiting} people`}
-                </div>
-                <div className="text-sm text-dynamic-text-secondary">
-                  {queueStats.totalWaiting === 1 ? 'Ahead of You' : 'Ahead of You'}
-                </div>
+                <div className="text-2xl font-semibold text-dynamic-text mb-1">3 people</div>
+                <div className="text-sm text-dynamic-text-secondary">Ahead of You</div>
               </CardContent>
             </Card>
             
             <Card className="bg-dynamic-surface border-dynamic-border shadow-sm">
               <CardContent className="p-6 text-center">
-                <div className="flex items-center justify-between mb-3">
-                  <Star className="h-8 w-8 text-dynamic-primary" />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRefreshStats}
-                    disabled={refreshing}
-                    className="p-1 h-auto"
-                  >
-                    <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-                  </Button>
-                </div>
+                <Star className="h-8 w-8 text-dynamic-primary mx-auto mb-3" />
                 <div className="text-2xl font-semibold text-dynamic-text mb-1">4.9/5</div>
                 <div className="text-sm text-dynamic-text-secondary">Customer Rating</div>
               </CardContent>

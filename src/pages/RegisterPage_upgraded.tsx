@@ -124,8 +124,7 @@ const RegisterPage = () => {
                 </p>
                 <Button
                   onClick={() => navigate("/login")}
-                  className="text-white px-8 py-3 rounded-full hover:opacity-90 transition-colors flex items-center gap-2 mx-auto"
-                  style={{backgroundColor: '#d34000'}}
+                  className="bg-dynamic-primary text-white px-8 py-3 rounded-full hover:bg-dynamic-primary-hover transition-colors flex items-center gap-2 mx-auto"
                 >
                   <Crown className="h-5 w-5" />
                   Sign In to Your Account
@@ -248,7 +247,7 @@ const RegisterPage = () => {
                 </CardHeader>
                 <CardContent>
                   {error && (
-                    <div className="mb-6 p-4 bg-dynamic-primary/10 border border-dynamic-primary/20 rounded-lg">
+                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                       <p className="text-red-600 text-sm">{error}</p>
                     </div>
                   )}
@@ -390,8 +389,7 @@ const RegisterPage = () => {
                       <Button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full text-white hover:opacity-90 transition-colors h-12 rounded-xl text-lg flex items-center justify-center gap-2"
-                        style={{backgroundColor: '#d34000'}}
+                        className="w-full bg-dynamic-primary text-white hover:bg-dynamic-primary-hover transition-colors h-12 rounded-xl text-lg flex items-center justify-center gap-2"
                       >
                         {isLoading ? (
                           "Creating Account..."

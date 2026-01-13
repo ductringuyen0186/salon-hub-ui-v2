@@ -17,7 +17,7 @@ interface TopRightUserProfileProps {
 }
 
 const TopRightUserProfile: React.FC<TopRightUserProfileProps> = () => {
-  const { logout, isAuthenticated, user, isLoading } = useAuth();
+  const { logout, isAuthenticated, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -26,7 +26,7 @@ const TopRightUserProfile: React.FC<TopRightUserProfileProps> = () => {
   // Debug auth state
   useEffect(() => {
     // Optional: Add any side effects when auth state changes
-  }, [isAuthenticated, user, isLoading]);
+  }, [isAuthenticated, user, loading]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -104,18 +104,18 @@ const TopRightUserProfile: React.FC<TopRightUserProfileProps> = () => {
     switch (role) {
       case 'ADMIN': return 'bg-dynamic-primary/10 text-dynamic-primary border border-dynamic-primary/20';
       case 'MANAGER': return 'bg-dynamic-accent/10 text-dynamic-accent border border-dynamic-accent/20';
-      case 'FRONT_DESK': return 'bg-green-100 text-green-700 border border-green-200';
-      case 'TECHNICIAN': return 'bg-purple-100 text-purple-700 border border-purple-200';
-      case 'CUSTOMER': return 'bg-gray-100 text-gray-700 border border-gray-200';
-      default: return 'bg-gray-100 text-gray-700 border border-gray-200';
+      case 'FRONT_DESK': return 'bg-dynamic-accent/10 text-dynamic-accent border border-dynamic-accent/20';
+      case 'TECHNICIAN': return 'bg-dynamic-primary/10 text-dynamic-primary border border-dynamic-primary/20';
+      case 'CUSTOMER': return 'bg-dynamic-text-secondary/10 text-dynamic-text-secondary border border-dynamic-border';
+      default: return 'bg-dynamic-text-secondary/10 text-dynamic-text-secondary border border-dynamic-border';
     }
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex items-center space-x-4">
-        <div className="animate-pulse w-20 h-8 bg-gray-300 rounded"></div>
-        <div className="animate-pulse w-20 h-8 bg-gray-300 rounded"></div>
+        <div className="animate-pulse w-20 h-8 bg-dynamic-border rounded"></div>
+        <div className="animate-pulse w-20 h-8 bg-dynamic-border rounded"></div>
       </div>
     );
   }
@@ -232,7 +232,7 @@ const TopRightUserProfile: React.FC<TopRightUserProfileProps> = () => {
           <div className="border-t border-dynamic-border py-2">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200 rounded-lg mx-2"
+              className="w-full flex items-center px-4 py-3 text-sm text-dynamic-primary hover:bg-dynamic-primary/10 hover:text-dynamic-primary-dark transition-all duration-200 rounded-lg mx-2"
             >
               <LogOut className="w-4 h-4 mr-3" />
               Log out

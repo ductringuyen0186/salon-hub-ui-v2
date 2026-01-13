@@ -47,7 +47,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { apiService } from "@/services/api";
-import { isAdmin, isAuthenticated, clearAuthData } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import Navigation from "./Navigation";
 
 interface Customer {
   id: string;
@@ -61,6 +62,7 @@ interface Customer {
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -68,66 +70,92 @@ const AdminDashboard = () => {
 
   // Check authentication and admin role
   useEffect(() => {
-    if (!isAuthenticated() || !isAdmin()) {
+    if (!isAuthenticated || !user || !['ADMIN', 'MANAGER'].includes(user.role)) {
       // Redirect to login if not authenticated or not admin
       navigate('/login');
     }
-  }, [navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const response = await api.get('/checkin/queue');
-        if (response.data) {
-          // Transform the data to match your Customer interface
-          const formattedCustomers = response.data.map((customer: any) => ({
-            id: customer.id.toString(),
-            name: customer.name,
-            contact: customer.contact,
-            status: customer.inStore ? "in-store" : "online",
-            waitTime: customer.estimatedWaitTime,
-            checkInTime: customer.checkInTime,
-            service: customer.requestedService || "Not specified"
-          }));
-          setCustomers(formattedCustomers);
-        }
-      } catch (error) {
-        console.error("Failed to fetch customers:", error);
-      }
-    };
-
-    fetchCustomers();
+    fetchQueueData();
     
     // Set up polling to refresh data every 30 seconds
-    const interval = setInterval(fetchCustomers, 30000);
+    const interval = setInterval(fetchQueueData, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleStatusChange = (
+  const fetchQueueData = async () => {
+    try {
+      const queueEntries = await apiService.getQueue();
+      // Transform the data to match your Customer interface
+      const formattedCustomers = queueEntries.map((entry) => ({
+        id: entry.id.toString(),
+        name: entry.customer.name,
+        contact: entry.customer.phoneNumber || entry.customer.email || 'N/A',
+        status: entry.status === 'WAITING' ? "in-store" as const : 
+                entry.status === 'IN_PROGRESS' ? "online" as const : "in-store" as const,
+        waitTime: entry.estimatedWaitTime,
+        checkInTime: entry.checkInTime,
+        service: entry.service?.name || "Walk-in Service"
+      }));
+      setCustomers(formattedCustomers);
+    } catch (error) {
+      console.error("Failed to fetch queue data:", error);
+      // Fallback to empty array if API fails
+      setCustomers([]);
+    }
+  };
+
+  const handleStatusChange = async (
     customerId: string,
     newStatus: "online" | "in-store",
   ) => {
-    setCustomers(
-      customers.map((customer) =>
-        customer.id === customerId
-          ? { ...customer, status: newStatus }
-          : customer,
-      ),
-    );
+    try {
+      // Map frontend status to backend status
+      const backendStatus = newStatus === "online" ? "IN_PROGRESS" : "WAITING";
+      await apiService.updateQueueStatus(parseInt(customerId), backendStatus);
+      
+      // Update local state
+      setCustomers(
+        customers.map((customer) =>
+          customer.id === customerId
+            ? { ...customer, status: newStatus }
+            : customer,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to update customer status:", error);
+    }
   };
 
-  const handleWaitTimeChange = (customerId: string, minutes: number) => {
-    setCustomers(
-      customers.map((customer) =>
-        customer.id === customerId
-          ? { ...customer, waitTime: minutes }
-          : customer,
-      ),
-    );
+  const handleWaitTimeChange = async (customerId: string, minutes: number) => {
+    try {
+      await apiService.updateQueueEntry(parseInt(customerId), { 
+        estimatedWaitTime: minutes 
+      });
+      
+      // Update local state
+      setCustomers(
+        customers.map((customer) =>
+          customer.id === customerId
+            ? { ...customer, waitTime: minutes }
+            : customer,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to update wait time:", error);
+    }
   };
 
-  const handleRemoveCustomer = (customerId: string) => {
-    setCustomers(customers.filter((customer) => customer.id !== customerId));
+  const handleRemoveCustomer = async (customerId: string) => {
+    try {
+      await apiService.removeFromQueue(parseInt(customerId));
+      
+      // Update local state
+      setCustomers(customers.filter((customer) => customer.id !== customerId));
+    } catch (error) {
+      console.error("Failed to remove customer from queue:", error);
+    }
   };
 
   const handleEditCustomer = (customer: Customer) => {
@@ -135,40 +163,35 @@ const AdminDashboard = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editingCustomer) {
-      setCustomers(
-        customers.map((customer) =>
-          customer.id === editingCustomer.id ? editingCustomer : customer,
-        ),
-      );
-      setIsDialogOpen(false);
-      setEditingCustomer(null);
+      try {
+        // Update customer in backend
+        await apiService.updateQueueEntry(parseInt(editingCustomer.id), {
+          estimatedWaitTime: editingCustomer.waitTime,
+          // Add other updatable fields as needed
+        });
+        
+        // Update local state
+        setCustomers(
+          customers.map((customer) =>
+            customer.id === editingCustomer.id ? editingCustomer : customer,
+          ),
+        );
+        setIsDialogOpen(false);
+        setEditingCustomer(null);
+      } catch (error) {
+        console.error("Failed to update customer:", error);
+      }
     }
   };
 
   const handleRefresh = async () => {
-    try {
-      const response = await api.get('/checkin/queue');
-      if (response.data) {
-        const formattedCustomers = response.data.map((customer: any) => ({
-          id: customer.id.toString(),
-          name: customer.name,
-          contact: customer.contact,
-          status: customer.inStore ? "in-store" : "online",
-          waitTime: customer.estimatedWaitTime,
-          checkInTime: customer.checkInTime,
-          service: customer.requestedService || "Not specified"
-        }));
-        setCustomers(formattedCustomers);
-      }
-    } catch (error) {
-      console.error("Failed to refresh customers:", error);
-    }
+    await fetchQueueData();
   };
 
   const handleLogout = () => {
-    clearAuthData();
+    logout();
     navigate('/login');
   };
 
@@ -179,27 +202,30 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="bg-dynamic-background p-6 min-h-screen">
-      <Card className="bg-dynamic-surface border-dynamic-border mb-6">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl text-dynamic-text">Salon Admin Dashboard</CardTitle>
-            <CardDescription className="text-dynamic-text-secondary">
-              Manage customer queue, update statuses, and adjust wait times
-            </CardDescription>
-          </div>
-          <div className="flex gap-2">
-            <Link to="/">
-              <Button variant="outline" size="sm">
-                Return to Home
+    <div className="bg-dynamic-background min-h-screen">
+      <Navigation 
+        title="Admin Dashboard"
+        subtitle="Salon Management System"
+        showBackButton={true}
+        backTo="/"
+      />
+      
+      <div className="p-6">
+        <Card className="bg-dynamic-surface border-dynamic-border mb-6">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl text-dynamic-text">Salon Admin Dashboard</CardTitle>
+              <CardDescription className="text-dynamic-text-secondary">
+                Manage customer queue, update statuses, and adjust wait times
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                Logout
               </Button>
-            </Link>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              Logout
-            </Button>
-          </div>
-        </CardHeader>
-      </Card>
+            </div>
+          </CardHeader>
+        </Card>
 
       <Tabs defaultValue="queue" className="w-full">
         <TabsList className="mb-4">
@@ -225,7 +251,7 @@ const AdminDashboard = () => {
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
               </Button>
-              <Button size="sm">
+              <Button size="sm" style={{backgroundColor: '#d34000'}}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Customer
               </Button>
@@ -449,7 +475,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <div className="pt-4">
-                <Button>Save Settings</Button>
+                <Button style={{backgroundColor: '#d34000'}}>Save Settings</Button>
               </div>
             </CardContent>
           </Card>
@@ -550,10 +576,11 @@ const AdminDashboard = () => {
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSaveEdit}>Save Changes</Button>
+            <Button onClick={handleSaveEdit} style={{backgroundColor: '#d34000'}}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 };

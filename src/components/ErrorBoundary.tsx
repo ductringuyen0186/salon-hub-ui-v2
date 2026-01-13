@@ -46,7 +46,7 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError,
           </details>
         )}
         <div className="flex flex-col gap-2">
-          <Button onClick={resetError} className="w-full">
+          <Button onClick={resetError} className="w-full" style={{backgroundColor: '#d34000'}}>
             <RefreshCw className="w-4 h-4 mr-2" />
             Try Again
           </Button>

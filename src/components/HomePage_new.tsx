@@ -188,7 +188,7 @@ const HomePage = () => {
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-xl font-medium text-dynamic-text">{service.name}</h3>
                         {service.popular && (
-                          <Badge className="bg-dynamic-accent/20 text-dynamic-accent border-dynamic-accent/30 text-xs">
+                          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
                             Popular
                           </Badge>
                         )}
@@ -209,8 +209,7 @@ const HomePage = () => {
                       </div>
                       <Button
                         onClick={() => navigate("/booking")}
-                        className="text-white px-4 py-2 rounded-full hover:opacity-90 transition-all duration-200 text-sm"
-                        style={{backgroundColor: '#d34000'}}
+                        className="bg-dynamic-primary text-white px-4 py-2 rounded-full hover:bg-dynamic-primary-hover transition-colors text-sm"
                       >
                         Book Now
                       </Button>
@@ -225,8 +224,7 @@ const HomePage = () => {
             <Button
               onClick={() => navigate("/services")}
               variant="outline"
-              className="border-2 text-white px-8 py-3 rounded-full hover:opacity-90 transition-all duration-300 flex items-center gap-2 mx-auto"
-              style={{backgroundColor: '#d34000', borderColor: '#d34000'}}
+              className="border-2 border-dynamic-primary text-dynamic-primary px-8 py-3 rounded-full hover:bg-dynamic-primary hover:text-white transition-all duration-300 flex items-center gap-2 mx-auto"
             >
               View All Services
               <ArrowRight className="h-5 w-5" />
@@ -250,8 +248,7 @@ const HomePage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={() => navigate("/booking")}
-                className="text-white px-8 py-3 rounded-full hover:opacity-90 transition-all duration-300 text-lg flex items-center gap-2 justify-center"
-                style={{backgroundColor: '#d34000'}}
+                className="bg-dynamic-primary text-white px-8 py-3 rounded-full hover:bg-dynamic-primary-hover transition-all duration-300 text-lg flex items-center gap-2 justify-center"
               >
                 <Calendar className="h-5 w-5" />
                 Schedule Appointment

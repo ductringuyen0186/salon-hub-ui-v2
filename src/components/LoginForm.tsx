@@ -47,7 +47,7 @@ const LoginForm: React.FC = () => {
     setError(null);
 
     try {
-      await login(formData);
+      await login(formData.email, formData.password);
       setShouldNavigate(true);
     } catch (err) {
       console.error('Login error:', err);
@@ -86,7 +86,8 @@ const LoginForm: React.FC = () => {
           <p className="text-dynamic-text-secondary">Email: {user.email}</p>
           <button
             onClick={() => navigate(getDashboardPath())}
-            className="w-full bg-dynamic-primary text-white py-2 px-4 rounded-md hover:bg-dynamic-primary-hover transition-colors mt-4"
+            className="w-full text-white py-2 px-4 rounded-md hover:opacity-90 transition-colors mt-4"
+            style={{backgroundColor: '#d34000'}}
           >
             Go to Dashboard
           </button>
@@ -156,7 +157,8 @@ const LoginForm: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-dynamic-primary text-white py-2 px-4 rounded-md hover:bg-dynamic-primary-hover focus:outline-none focus:ring-2 focus:ring-dynamic-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full text-white py-2 px-4 rounded-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                style={{backgroundColor: '#d34000'}}
               >
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>

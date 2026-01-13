@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import TopRightUserProfile from './TopRightUserProfile';
 import {
   ArrowLeft,
   Menu,
   X
 } from 'lucide-react';
-import { USE_MOCK_API } from '@/services/mockApi';
 
 interface NavigationProps {
   showBackButton?: boolean;
@@ -65,7 +65,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 Home
               </Link>
               <Link
-                to="/book"
+                to="/services"
                 className="text-dynamic-text hover:text-dynamic-primary transition-colors font-light tracking-wide"
               >
                 Services
@@ -76,31 +76,12 @@ const Navigation: React.FC<NavigationProps> = ({
               >
                 Check In
               </Link>
-              {USE_MOCK_API && (
-                <Link
-                  to="/testing"
-                  className="text-dynamic-accent hover:text-dynamic-primary transition-colors font-light tracking-wide text-sm"
-                >
-                  Testing
-                </Link>
-              )}
             </nav>
           </div>
 
-          {/* Right side - CTA buttons */}
+          {/* Right side - User Profile */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link
-              to="/login"
-              className="text-dynamic-text hover:text-dynamic-primary transition-colors font-light tracking-wide"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/book"
-              className="bg-dynamic-primary text-white px-6 py-2 rounded-full hover:bg-dynamic-primary-hover transition-colors font-light tracking-wide shadow-sm"
-            >
-              Book Now
-            </Link>
+            <TopRightUserProfile />
           </div>
 
           {/* Mobile menu button */}
@@ -142,7 +123,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   Home
                 </Link>
                 <Link
-                  to="/book"
+                  to="/services"
                   className="block text-dynamic-text hover:text-dynamic-primary transition-colors font-light tracking-wide py-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -155,33 +136,11 @@ const Navigation: React.FC<NavigationProps> = ({
                 >
                   Check In
                 </Link>
-                {USE_MOCK_API && (
-                  <Link
-                    to="/testing"
-                    className="block text-dynamic-accent hover:text-dynamic-primary transition-colors font-light tracking-wide py-2 text-sm"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Testing
-                  </Link>
-                )}
               </div>
 
-              {/* Mobile CTA Buttons */}
-              <div className="pt-4 border-t border-dynamic-border space-y-3">
-                <Link
-                  to="/login"
-                  className="block w-full text-center text-dynamic-text hover:text-dynamic-primary transition-colors font-light tracking-wide py-3 border border-dynamic-border rounded-full hover:border-dynamic-primary"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/book"
-                  className="block w-full text-center bg-dynamic-primary text-white py-3 rounded-full hover:bg-dynamic-primary-hover transition-colors font-light tracking-wide shadow-sm"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Book Now
-                </Link>
+              {/* Mobile User Profile */}
+              <div className="pt-4 border-t border-dynamic-border">
+                <TopRightUserProfile />
               </div>
             </div>
             </div>

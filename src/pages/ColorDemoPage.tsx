@@ -54,7 +54,7 @@ const ColorDemoPage: React.FC = () => {
                 <CardTitle className="text-dynamic-text">Buttons</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full bg-dynamic-primary hover:bg-dynamic-primary-hover text-white">
+                <Button className="w-full text-white">
                   Primary Button
                 </Button>
                 <Button 

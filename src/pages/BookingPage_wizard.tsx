@@ -7,9 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import Navigation from '@/components/Navigation';
-import { apiService } from '@/services/api';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/contexts/ToastContext';
 import {
   Calendar,
   Clock,
@@ -23,8 +20,7 @@ import {
   ArrowLeft,
   Phone,
   Mail,
-  User,
-  Loader2
+  User
 } from 'lucide-react';
 import { services, employees, generateTimeSlots } from '@/lib/bookingData';
 import { format } from 'date-fns';
@@ -33,8 +29,6 @@ import { cn } from '@/lib/utils';
 type BookingStep = 'services' | 'datetime' | 'details' | 'confirmation';
 
 const BookingPage = () => {
-  const { isAuthenticated, user } = useAuth();
-  const { success, error: showError } = useToast();
   const [currentStep, setCurrentStep] = useState<BookingStep>('services');
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
@@ -48,8 +42,6 @@ const BookingPage = () => {
     notes: ''
   });
   const [bookingComplete, setBookingComplete] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingData, setBookingData] = useState<any>(null);
 
   const steps = [
     { id: 'services', title: 'Services', description: 'Choose your treatments' },
@@ -60,18 +52,6 @@ const BookingPage = () => {
 
   const currentStepIndex = steps.findIndex(step => step.id === currentStep);
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
-
-  // Auto-populate customer info for authenticated users
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      setCustomerInfo(prev => ({
-        ...prev,
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phoneNumber || ''
-      }));
-    }
-  }, [isAuthenticated, user]);
 
   useEffect(() => {
     if (selectedDate) {
@@ -129,60 +109,8 @@ const BookingPage = () => {
     }
   };
 
-  const handleBookingSubmit = async () => {
-    try {
-      setIsSubmitting(true);
-      
-      // Validate required fields
-      const selectedServicesDetails = getSelectedServicesDetails();
-      if (selectedServicesDetails.length === 0 || !selectedDate || !selectedTime) {
-        throw new Error('Please complete all booking requirements');
-      }
-
-      if (!customerInfo.name.trim() || !customerInfo.email.trim() || !customerInfo.phone.trim()) {
-        throw new Error('Please provide your contact information');
-      }
-
-      // Use the first selected service and staff for the booking
-      const primaryService = selectedServicesDetails[0];
-      const selectedStaff = employees.find(emp => emp.id === selectedEmployee) || employees[0];
-
-      // Format the booking data for the backend
-      const bookingData = {
-        customerId: isAuthenticated && user ? user.id : null,
-        customerName: customerInfo.name.trim(),
-        customerEmail: customerInfo.email.trim(),
-        customerPhone: customerInfo.phone.trim(),
-        serviceId: parseInt(primaryService.id) || 1, // Convert string ID to number
-        serviceName: primaryService.name,
-        staffId: parseInt(selectedStaff.id) || 1, // Convert string ID to number
-        staffName: selectedStaff.name,
-        appointmentDate: format(selectedDate, 'yyyy-MM-dd'),
-        appointmentTime: selectedTime,
-        duration: getTotalDuration(),
-        price: getTotalPrice(),
-        notes: customerInfo.notes?.trim() || '',
-        status: 'SCHEDULED'
-      };
-
-      const response = await apiService.createAppointment(bookingData);
-      
-      if (response.success) {
-        // Show success message
-        success(`Your appointment on ${format(selectedDate, 'MMM dd')} at ${selectedTime} has been scheduled.`);
-
-        // Store booking data for confirmation display
-        setBookingData(bookingData);
-        setBookingComplete(true);
-      } else {
-        throw new Error(response.message || 'Failed to create appointment');
-      }
-    } catch (error) {
-      console.error('Booking submission error:', error);
-      showError(error instanceof Error ? error.message : "Unable to process your booking. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleBookingSubmit = () => {
+    setBookingComplete(true);
   };
 
   if (bookingComplete) {
@@ -209,48 +137,32 @@ const BookingPage = () => {
               <CardContent className="p-8">
                 <div className="space-y-4 text-left">
                   <div className="flex justify-between">
-                    <span className="text-dynamic-text-secondary">Service:</span>
+                    <span className="text-dynamic-text-secondary">Services:</span>
                     <span className="text-dynamic-text font-medium">
-                      {bookingData?.serviceName || getSelectedServicesDetails()[0]?.name || 'Service'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-dynamic-text-secondary">Staff Member:</span>
-                    <span className="text-dynamic-text font-medium">
-                      {bookingData?.staffName || (selectedEmployee ? employees.find(emp => emp.id === selectedEmployee)?.name : 'Any available')}
+                      {getSelectedServicesDetails().map(s => s.name).join(', ')}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-dynamic-text-secondary">Date & Time:</span>
                     <span className="text-dynamic-text font-medium">
-                      {bookingData ? 
-                        format(new Date(bookingData.appointmentDate), 'EEEE, MMMM d') + ' at ' + bookingData.appointmentTime :
-                        selectedDate ? format(selectedDate, 'EEEE, MMMM d') + ' at ' + selectedTime : 'Date & Time'
-                      }
+                      {selectedDate && format(selectedDate, 'EEEE, MMMM d')} at {selectedTime}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-dynamic-text-secondary">Duration:</span>
-                    <span className="text-dynamic-text font-medium">{bookingData?.duration || getTotalDuration()} minutes</span>
+                    <span className="text-dynamic-text font-medium">{getTotalDuration()} minutes</span>
                   </div>
                   <div className="flex justify-between text-lg font-semibold">
                     <span className="text-dynamic-text">Total:</span>
-                    <span className="text-dynamic-primary">${bookingData?.price || getTotalPrice()}</span>
+                    <span className="text-dynamic-primary">${getTotalPrice()}</span>
                   </div>
-                  {bookingData?.notes && (
-                    <div className="pt-4 border-t border-dynamic-border">
-                      <span className="text-dynamic-text-secondary">Notes:</span>
-                      <p className="text-dynamic-text mt-1">{bookingData.notes}</p>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
 
             <Button 
               onClick={() => window.location.href = '/'}
-              className="mt-8 text-white px-8 py-3"
-              style={{backgroundColor: '#d34000'}}
+              className="mt-8 bg-dynamic-primary text-white px-8 py-3"
             >
               Return to Home
             </Button>
@@ -279,7 +191,7 @@ const BookingPage = () => {
                     "w-12 h-12 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300",
                     index <= currentStepIndex 
                       ? "bg-dynamic-primary text-white" 
-                      : "bg-dynamic-muted text-dynamic-text-secondary"
+                      : "bg-gray-200 text-gray-500"
                   )}>
                     {index + 1}
                   </div>
@@ -295,7 +207,7 @@ const BookingPage = () => {
                   {index < steps.length - 1 && (
                     <div className={cn(
                       "hidden sm:block w-24 h-0.5 mx-4 transition-all duration-300",
-                      index < currentStepIndex ? "bg-dynamic-primary" : "bg-dynamic-muted"
+                      index < currentStepIndex ? "bg-dynamic-primary" : "bg-gray-200"
                     )} />
                   )}
                 </div>
@@ -340,7 +252,7 @@ const BookingPage = () => {
                             )}
                           </div>
                           {service.popular && (
-                            <Badge className="bg-dynamic-accent/20 text-dynamic-accent border-dynamic-accent/30">
+                            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
                               Popular
                             </Badge>
                           )}
@@ -367,7 +279,7 @@ const BookingPage = () => {
                   </div>
 
                   {selectedServices.length > 0 && (
-                    <div className="mt-8 p-6 bg-gradient-to-r from-dynamic-primary/10 to-dynamic-accent/10 rounded-2xl border border-dynamic-primary/20">
+                    <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl border border-green-200">
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-gray-800 mb-1">
@@ -451,10 +363,9 @@ const BookingPage = () => {
                               className={cn(
                                 "h-12 text-sm font-medium transition-all duration-200",
                                 selectedTime === slot.time 
-                                  ? "text-white shadow-md" 
+                                  ? "bg-dynamic-primary text-white shadow-md" 
                                   : "border-dynamic-border hover:border-dynamic-primary hover:bg-dynamic-primary/10"
                               )}
-                              style={selectedTime === slot.time ? {backgroundColor: '#d34000'} : {}}
                             >
                               {slot.time}
                             </Button>
@@ -690,28 +601,16 @@ const BookingPage = () => {
                 {currentStep === 'confirmation' ? (
                   <Button
                     onClick={handleBookingSubmit}
-                    disabled={isSubmitting}
-                    className="text-white px-8 py-3 flex items-center gap-2 hover:opacity-90 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{backgroundColor: '#d34000'}}
+                    className="bg-dynamic-primary text-white px-8 py-3 flex items-center gap-2"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Booking...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="h-4 w-4" />
-                        Confirm Booking
-                      </>
-                    )}
+                    <CheckCircle className="h-4 w-4" />
+                    Confirm Booking
                   </Button>
                 ) : (
                   <Button
                     onClick={handleNext}
                     disabled={!canProceedToNext()}
-                    className="text-white px-8 py-3 flex items-center gap-2 hover:opacity-90 transition-all duration-200"
-                    style={{backgroundColor: '#d34000'}}
+                    className="bg-dynamic-primary text-white px-8 py-3 flex items-center gap-2"
                   >
                     Next
                     <ArrowRight className="h-4 w-4" />
